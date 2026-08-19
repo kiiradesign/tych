@@ -42,16 +42,47 @@ function chunk(type: string, data: Uint8Array): Uint8Array {
 }
 
 async function zlibDeflate(data: Uint8Array): Promise<Uint8Array> {
-  if (typeof CompressionStream === "undefined") {
-    throw new Error(
-      "This browser cannot encode PNG-8. Try a current Chrome, Safari, or Firefox.",
-    );
+  if (typeof CompressionStream !== "undefined") {
+    const stream = new Blob([data as BlobPart])
+      .stream()
+      .pipeThrough(new CompressionStream("deflate"));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
   }
+  return zlibStore(data);
+}
 
-  const stream = new Blob([data as BlobPart])
-    .stream()
-    .pipeThrough(new CompressionStream("deflate"));
-  return new Uint8Array(await new Response(stream).arrayBuffer());
+function adler32(data: Uint8Array): number {
+  let a = 1;
+  let b = 0;
+  for (let i = 0; i < data.length; i++) {
+    a = (a + data[i]) % 65521;
+    b = (b + a) % 65521;
+  }
+  return ((b << 16) | a) >>> 0;
+}
+
+/** Uncompressed zlib/deflate — used when CompressionStream is missing (older mobile Safari). */
+function zlibStore(data: Uint8Array): Uint8Array {
+  const parts: Uint8Array[] = [new Uint8Array([0x78, 0x01])];
+  const max = 65535;
+  if (data.length === 0) {
+    parts.push(new Uint8Array([1, 0, 0, 0xff, 0xff]));
+  } else {
+    for (let i = 0; i < data.length; i += max) {
+      const slice = data.subarray(i, Math.min(i + max, data.length));
+      const last = i + max >= data.length;
+      const header = new Uint8Array(5);
+      header[0] = last ? 1 : 0;
+      header[1] = slice.length & 0xff;
+      header[2] = slice.length >> 8;
+      const nlen = ~slice.length & 0xffff;
+      header[3] = nlen & 0xff;
+      header[4] = nlen >> 8;
+      parts.push(header, slice);
+    }
+  }
+  parts.push(u32(adler32(data)));
+  return concat(parts);
 }
 
 type Box = {
@@ -263,14 +294,60 @@ export async function encodePng8(imageData: ImageData): Promise<Blob> {
   return new Blob([png as BlobPart], { type: "image/png" });
 }
 
-export function downloadBlob(blob: Blob, filename: string) {
+function isAppleTouchDevice() {
+  return (
+    /iP(hone|ad|od)/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+}
+
+async function shareImageFile(
+  blob: Blob,
+  filename: string,
+  type: string,
+): Promise<"shared" | "cancelled" | "unavailable"> {
+  if (typeof navigator.share !== "function") return "unavailable";
+  const file = new File([blob], filename, { type });
+  if (typeof navigator.canShare === "function" && !navigator.canShare({ files: [file] })) {
+    return "unavailable";
+  }
+  try {
+    await navigator.share({ files: [file] });
+    return "shared";
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") return "cancelled";
+    return "unavailable";
+  }
+}
+
+function openBlobTab(blob: Blob) {
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank", "noopener,noreferrer");
+  window.setTimeout(() => URL.revokeObjectURL(url), 120_000);
+}
+
+function triggerAnchorDownload(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.rel = "noopener";
+  a.style.display = "none";
   document.body.appendChild(a);
   a.click();
   a.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  window.setTimeout(() => iframe.remove(), 30_000);
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
+export async function downloadBlob(blob: Blob, filename: string) {
+  const type = blob.type || "image/png";
+  const result = await shareImageFile(blob, filename, type);
+  if (result === "shared" || result === "cancelled") return;
+  if (isAppleTouchDevice()) openBlobTab(blob);
+  else triggerAnchorDownload(blob, filename);
 }

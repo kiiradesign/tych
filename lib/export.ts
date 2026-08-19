@@ -16,5 +16,5 @@ export async function exportTychPng(options: {
   if (!ctx) throw new Error("Canvas is unavailable.");
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const blob = await encodePng8(imageData);
-  downloadBlob(blob, `tych-${count}.png`);
+  await downloadBlob(blob, `tych-${count}.png`);
 }
