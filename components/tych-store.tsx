@@ -250,18 +250,32 @@ export function TychProvider({ children }: { children: ReactNode }) {
     [placeFile],
   );
 
-  const clearSlot = useCallback((index: number) => {
-    setSlots((prev) => {
-      disposeSlot(prev[index] ?? null);
-      const kept = prev.filter((_, i) => i !== index);
-      return [...kept, null];
-    });
-    setCrops((prev) => {
-      const kept = prev.filter((_, i) => i !== index);
-      return [...kept, { ...DEFAULT_CROP }];
-    });
-    setSelected((current) => (current > index ? current - 1 : current));
-  }, []);
+  const clearSlot = useCallback(
+    (index: number) => {
+      disposeSlot(slots[index] ?? null);
+      const remaining = slots
+        .map((slot, i) => ({
+          slot,
+          crop: crops[i] ?? { ...DEFAULT_CROP },
+        }))
+        .filter((_, i) => i !== index)
+        .filter((item): item is { slot: SlotImage; crop: CropState } => Boolean(item.slot));
+
+      const nextCount = panelCountFor(remaining.length || 1);
+      const nextSlots = emptySlots(nextCount);
+      const nextCrops = emptyCrops(nextCount);
+      remaining.forEach((item, i) => {
+        nextSlots[i] = item.slot;
+        nextCrops[i] = item.crop;
+      });
+
+      setCountState(nextCount);
+      setSlots(nextSlots);
+      setCrops(nextCrops);
+      setSelected((current) => Math.min(current, nextCount - 1));
+    },
+    [crops, slots],
+  );
 
   const value = useMemo<TychContextValue>(
     () => ({
