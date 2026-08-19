@@ -38,6 +38,7 @@ type TychContextValue = {
   setCrop: (index: number, crop: CropState) => void;
   setZoom: (index: number, zoom: number) => void;
   addFiles: (files: File[], startIndex?: number) => Promise<void>;
+  replaceAll: (files: File[]) => Promise<void>;
   replaceSlot: (index: number, file: File) => Promise<void>;
   clearSlot: (index: number) => void;
   setExporting: (value: boolean) => void;
@@ -65,16 +66,23 @@ export function TychProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
+    let alive = true;
+    const created: SlotImage[] = [];
 
     void (async () => {
       const loaded = await Promise.all(
         PLACEHOLDER_PATHS.map((path) => loadPlaceholderSlot(path)),
       );
-      if (cancelled) {
-        loaded.forEach((image) => disposeSlot(image));
+      for (const image of loaded) {
+        if (image) created.push(image);
+      }
+
+      if (!alive) {
+        created.forEach((image) => disposeSlot(image));
         return;
       }
+
+      if (created.length === 0) return;
 
       setSlots((prev) => {
         const next = [...prev];
@@ -88,7 +96,7 @@ export function TychProvider({ children }: { children: ReactNode }) {
     })();
 
     return () => {
-      cancelled = true;
+      alive = false;
     };
   }, []);
 
@@ -201,6 +209,35 @@ export function TychProvider({ children }: { children: ReactNode }) {
     [count, slots],
   );
 
+  const replaceAll = useCallback(async (files: File[]) => {
+    setError(null);
+    const incoming = files.filter(Boolean).slice(0, 4);
+    if (incoming.length === 0) return;
+    const targetCount = panelCountFor(incoming.length);
+
+    try {
+      const loaded = await Promise.all(
+        incoming.map(async (file, i) => ({
+          index: i,
+          image: await loadSlotImage(file),
+        })),
+      );
+
+      if (targetCount !== count) setCountState(targetCount);
+
+      setSlots((prev) => {
+        prev.forEach(disposeSlot);
+        const next = emptySlots(targetCount);
+        for (const { index, image } of loaded) next[index] = image;
+        return next;
+      });
+      setCrops(emptyCrops(targetCount));
+      setSelected(0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not read those files.");
+    }
+  }, [count]);
+
   const replaceSlot = useCallback(
     async (index: number, file: File) => {
       setError(null);
@@ -243,6 +280,7 @@ export function TychProvider({ children }: { children: ReactNode }) {
       setCrop,
       setZoom,
       addFiles,
+      replaceAll,
       replaceSlot,
       clearSlot,
       setExporting,
@@ -250,6 +288,7 @@ export function TychProvider({ children }: { children: ReactNode }) {
     }),
     [
       addFiles,
+      replaceAll,
       clearSlot,
       count,
       crops,

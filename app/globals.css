@@ -320,7 +320,9 @@
   }
 
   .credit-link {
-    color: var(--foreground);
+    color: var(--panel-text-muted);
+    font-size: 12px;
+    line-height: 1.625;
     transition: color 150ms var(--ease);
   }
 
@@ -365,7 +367,7 @@
   }
 
   .credit-link:hover {
-    color: var(--panel-text-muted);
+    color: var(--panel-text-strong);
   }
 
   .icon-button:hover {

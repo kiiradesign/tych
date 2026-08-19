@@ -51,12 +51,32 @@ async function decodeHeic(file: Blob): Promise<Blob> {
   });
 }
 
+async function createBitmap(source: Blob | ImageBitmapSource): Promise<ImageBitmap> {
+  try {
+    return await createImageBitmap(source, {
+      imageOrientation: "from-image",
+    } as ImageBitmapOptions);
+  } catch {
+    return await createImageBitmap(source);
+  }
+}
+
 async function bitmapFrom(source: Blob, name: string): Promise<SlotImage> {
   const url = URL.createObjectURL(source);
   try {
-    const bitmap = await createImageBitmap(source, {
-      imageOrientation: "from-image",
-    } as ImageBitmapOptions);
+    let bitmap: ImageBitmap;
+    try {
+      bitmap = await createBitmap(source);
+    } catch {
+      bitmap = await new Promise<ImageBitmap>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          void createBitmap(img).then(resolve, reject);
+        };
+        img.onerror = () => reject(new Error("Could not read that photograph."));
+        img.src = url;
+      });
+    }
     return {
       id: crypto.randomUUID(),
       name,

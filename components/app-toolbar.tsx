@@ -15,6 +15,7 @@ export function AppToolbar() {
     exporting,
     error,
     addFiles,
+    replaceAll,
     setExporting,
     setError,
   } = useTych();
@@ -43,11 +44,11 @@ export function AppToolbar() {
         <LisseButton
           radius={6}
           autoEffects
-          disabled={exporting || atMax}
+          disabled={exporting}
           onClick={() => inputRef.current?.click()}
           className="btn-quiet h-10 px-3 text-[14px] font-medium"
         >
-          Add images
+          {atMax ? "Replace images" : "Add images"}
         </LisseButton>
         <input
           ref={inputRef}
@@ -58,7 +59,9 @@ export function AppToolbar() {
           onChange={(e) => {
             const files = [...(e.target.files ?? [])];
             e.target.value = "";
-            if (files.length) void addFiles(files);
+            if (!files.length) return;
+            if (atMax) void replaceAll(files);
+            else void addFiles(files);
           }}
         />
         <LisseButton

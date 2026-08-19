@@ -13,7 +13,7 @@ export function AppHeader() {
           href="https://x.com/kiiradesign"
           target="_blank"
           rel="noreferrer"
-          className="credit-link mt-2 inline-block text-[13px] leading-none text-foreground"
+          className="credit-link mt-2 inline-block"
         >
           Made by @kiiradesign
         </a>
