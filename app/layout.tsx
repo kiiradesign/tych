@@ -34,6 +34,20 @@ export const metadata: Metadata = {
       "Recreate the classic Twitter polyptych as a single transparent PNG. Photographs never leave the browser.",
     images: ["/tych-opengraph.png"],
   },
+  icons: {
+    icon: [
+      {
+        url: "/tych-favicon-darkmode.svg",
+        type: "image/svg+xml",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/tych-favicon-lightmode.svg",
+        type: "image/svg+xml",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
