@@ -39,8 +39,8 @@ tych brings the visual result back as a single postable image.
 | Images | Layout                          | Overall size   | Notes                          |
 |--------|---------------------------------|----------------|--------------------------------|
 | 2      | Side-by-side                    | 900 × 506      | Two equal panels               |
-| 3      | Large left + stacked right      | 900 × 600      | Classic Twitter 3-up           |
-| 4      | 2×2                             | 900 × 900      | Square polyptych               |
+| 3      | Large left + stacked right      | 900 × 506      | Same height as 2-up            |
+| 4      | 2×2                             | 900 × 506      | Same height as 2-up            |
 
 Gaps between panels are fully transparent (default 3 px).
 

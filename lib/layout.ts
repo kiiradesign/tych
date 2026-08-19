@@ -1,5 +1,5 @@
 import type { GapPx, PanelCount, Rect, TychLayout } from "./types";
-import { EXPORT_MAX_WIDTH } from "./types";
+import { EXPORT_HEIGHT, EXPORT_MAX_WIDTH } from "./types";
 
 /**
  * Integer split of `total` into two parts separated by `gap`.
@@ -21,15 +21,8 @@ export function panelCountFor(imageCount: number): PanelCount {
   return n as PanelCount;
 }
 
-export function canvasSizeFor(count: PanelCount): { width: number; height: number } {
-  switch (count) {
-    case 2:
-      return { width: EXPORT_MAX_WIDTH, height: 506 };
-    case 3:
-      return { width: EXPORT_MAX_WIDTH, height: 600 };
-    case 4:
-      return { width: EXPORT_MAX_WIDTH, height: 900 };
-  }
+export function canvasSizeFor(_count: PanelCount): { width: number; height: number } {
+  return { width: EXPORT_MAX_WIDTH, height: EXPORT_HEIGHT };
 }
 
 export function getTychLayout(count: PanelCount, gap: GapPx): TychLayout {

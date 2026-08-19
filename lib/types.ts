@@ -43,3 +43,5 @@ export const DEFAULT_CROP: CropState = {
 
 export const MAX_ZOOM = 5;
 export const EXPORT_MAX_WIDTH = 900;
+/** Shared canvas height for 2, 3, and 4 panels (classic 2-up / ~16:9). */
+export const EXPORT_HEIGHT = 506;
