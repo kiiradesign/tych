@@ -1,0 +1,10 @@
+---
+description: Commit always means push to origin/main
+alwaysApply: true
+---
+
+# Git
+
+This repo is **only `main`**. When the user asks to commit, also **push `main` to `origin`** (`git push origin main` or `git push -u origin HEAD`). Do not wait for a separate "push" or "merge to origin" request.
+
+Never force-push unless they explicitly ask.
