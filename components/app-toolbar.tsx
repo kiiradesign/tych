@@ -41,11 +41,11 @@ export function AppToolbar() {
     <div className="mt-6">
       <div className="flex items-center justify-between gap-4">
         <LisseButton
-          radius={8}
+          radius={6}
           autoEffects
           disabled={exporting || atMax}
           onClick={() => inputRef.current?.click()}
-          className="btn-quiet h-10 px-4 text-[14px] font-medium"
+          className="btn-quiet h-10 px-3 text-[14px] font-medium"
         >
           Add images
         </LisseButton>
@@ -62,10 +62,10 @@ export function AppToolbar() {
           }}
         />
         <LisseButton
-          radius={8}
+          radius={6}
           disabled={!ready || exporting}
           onClick={() => void onSave()}
-          className="btn-solid h-10 px-5 text-[14px] font-medium"
+          className="btn-solid h-10 px-3 text-[14px] font-medium"
         >
           {exporting ? "Saving…" : "Save"}
         </LisseButton>

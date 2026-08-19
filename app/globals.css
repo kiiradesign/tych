@@ -6,6 +6,7 @@
   --background: #ffffff;
   --foreground: #171717;
   --border: #eaeaea;
+  --border-hover: #c9c9c9;
   --muted: #f2f2f2;
   --muted-foreground: #4d4d4d;
   --ring: #006bff;
@@ -39,6 +40,7 @@
   --background: #000000;
   --foreground: #ededed;
   --border: #2e2e2e;
+  --border-hover: #454545;
   --muted: #1a1a1a;
   --muted-foreground: #a0a0a0;
   --ring: #47a8ff;
@@ -276,15 +278,15 @@
   }
 
   .btn-solid:disabled {
-    opacity: 0.4;
+    opacity: 0.5;
     cursor: not-allowed;
     transform: none;
   }
 
   .btn-quiet {
     border: 1px solid var(--border);
-    background: transparent;
-    color: var(--foreground);
+    background: var(--panel-row-bg);
+    color: var(--panel-text-strong);
     transition:
       background-color 150ms var(--ease),
       border-color 150ms var(--ease),
@@ -297,7 +299,7 @@
   }
 
   .btn-quiet:disabled {
-    opacity: 0.4;
+    opacity: 0.5;
     cursor: not-allowed;
     transform: none;
   }
@@ -379,7 +381,8 @@
   }
 
   .btn-quiet:hover:not(:disabled) {
-    background: var(--muted);
+    background: var(--panel-row-hover);
+    border-color: var(--border-hover);
   }
 }
 
