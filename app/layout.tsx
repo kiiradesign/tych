@@ -7,9 +7,33 @@ import { Providers } from "@/components/providers";
 import { ThemedDialRoot } from "@/components/themed-dial-root";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://tych.io"),
   title: "Tych",
   description:
     "Recreate the classic Twitter polyptych as a single transparent PNG. Photographs never leave the browser.",
+  openGraph: {
+    title: "Tych",
+    description:
+      "Recreate the classic Twitter polyptych as a single transparent PNG. Photographs never leave the browser.",
+    url: "https://tych.io",
+    siteName: "Tych",
+    type: "website",
+    images: [
+      {
+        url: "/tych-opengraph.png",
+        width: 1200,
+        height: 630,
+        alt: "Tych",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tych",
+    description:
+      "Recreate the classic Twitter polyptych as a single transparent PNG. Photographs never leave the browser.",
+    images: ["/tych-opengraph.png"],
+  },
 };
 
 export default function RootLayout({
