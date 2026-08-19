@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -11,6 +12,7 @@ import {
 import { getTychLayout, panelCountFor } from "@/lib/layout";
 import { zoomAt } from "@/lib/crop";
 import { disposeSlot, loadSlotImage } from "@/lib/images";
+import { loadPlaceholderSlot, PLACEHOLDER_PATHS } from "@/lib/placeholders";
 import {
   DEFAULT_CROP,
   type CropState,
@@ -53,14 +55,42 @@ function emptyCrops(count: PanelCount): CropState[] {
 }
 
 export function TychProvider({ children }: { children: ReactNode }) {
-  const [count, setCountState] = useState<PanelCount>(2);
+  const [count, setCountState] = useState<PanelCount>(4);
   const [gap, setGap] = useState<GapPx>(3);
-  const [slots, setSlots] = useState<Array<SlotImage | null>>(() => emptySlots(2));
-  const [crops, setCrops] = useState<CropState[]>(() => emptyCrops(2));
+  const [slots, setSlots] = useState<Array<SlotImage | null>>(() => emptySlots(4));
+  const [crops, setCrops] = useState<CropState[]>(() => emptyCrops(4));
   const [selected, setSelected] = useState(0);
   const [previewGround, setPreviewGround] = useState<PreviewGround>("checker");
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      const loaded = await Promise.all(
+        PLACEHOLDER_PATHS.map((path) => loadPlaceholderSlot(path)),
+      );
+      if (cancelled) {
+        loaded.forEach((image) => disposeSlot(image));
+        return;
+      }
+
+      setSlots((prev) => {
+        const next = [...prev];
+        loaded.forEach((image, index) => {
+          if (!image) return;
+          disposeSlot(next[index] ?? null);
+          next[index] = image;
+        });
+        return next;
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const setCount = useCallback((next: PanelCount) => {
     setCountState(next);
