@@ -41,15 +41,14 @@ export function AppToolbar() {
   return (
     <div className="mt-6">
       <div className="flex items-center justify-between gap-4">
-        <LisseButton
-          radius={6}
-          autoEffects
+        <button
+          type="button"
           disabled={exporting}
           onClick={() => inputRef.current?.click()}
-          className="btn-quiet h-10 px-3 text-[14px] font-medium"
+          className="btn-quiet geist-focus-visible h-10 px-3 text-[14px] font-medium"
         >
           {atMax ? "Replace images" : "Add images"}
-        </LisseButton>
+        </button>
         <input
           ref={inputRef}
           type="file"

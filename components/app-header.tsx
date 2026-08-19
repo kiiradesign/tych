@@ -6,17 +6,12 @@ export function AppHeader() {
   return (
     <header className="flex items-start justify-between gap-4">
       <div>
-        <h1 className="text-[22px] font-semibold leading-none tracking-tight text-foreground">
+        <h1 className="text-[32px] font-semibold leading-none tracking-tight text-foreground">
           Tych
         </h1>
-        <a
-          href="https://x.com/kiiradesign"
-          target="_blank"
-          rel="noreferrer"
-          className="credit-link mt-2 inline-block"
-        >
-          Made by @kiiradesign
-        </a>
+        <p className="panel-copy mt-3 max-w-[22rem]">
+          Make your own classic multi-image grid.
+        </p>
       </div>
       <ThemeToggle />
     </header>

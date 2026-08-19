@@ -63,32 +63,34 @@ export function CanvasStage() {
       onDragOver={(e) => e.preventDefault()}
       onDrop={onStageDrop}
     >
-      <div
-        ref={frameRef}
-        className="tych-frame relative w-full"
-        style={{
-          aspectRatio: `${layout.width} / ${layout.height}`,
-          borderRadius: 24,
-        }}
-      >
-        <div className="pointer-events-none absolute inset-0 bg-background" aria-hidden />
-        {cssPerPanelPx > 0
-          ? layout.panels.map((panel, index) => (
-              <PanelCropper
-                key={slots[index]?.id ?? `empty-${layout.count}-${index}`}
-                panel={panel}
-                image={slots[index] ?? null}
-                crop={crops[index]}
-                selected={selected === index}
-                index={index}
-                cssPerPanelPx={cssPerPanelPx}
-                onSelect={() => setSelected(index)}
-                onCrop={(crop: CropState) => setCrop(index, crop)}
-                onFiles={(files) => onReplace(index, files)}
-                onRemove={() => clearSlot(index)}
-              />
-            ))
-          : null}
+      <div className="tych-frame-shell">
+        <div
+          ref={frameRef}
+          className="tych-frame relative w-full"
+          style={{
+            aspectRatio: `${layout.width} / ${layout.height}`,
+            borderRadius: 24,
+          }}
+        >
+          <div className="pointer-events-none absolute inset-0 bg-background" aria-hidden />
+          {cssPerPanelPx > 0
+            ? layout.panels.map((panel, index) => (
+                <PanelCropper
+                  key={slots[index]?.id ?? `empty-${layout.count}-${index}`}
+                  panel={panel}
+                  image={slots[index] ?? null}
+                  crop={crops[index]}
+                  selected={selected === index}
+                  index={index}
+                  cssPerPanelPx={cssPerPanelPx}
+                  onSelect={() => setSelected(index)}
+                  onCrop={(crop: CropState) => setCrop(index, crop)}
+                  onFiles={(files) => onReplace(index, files)}
+                  onRemove={() => clearSlot(index)}
+                />
+              ))
+            : null}
+        </div>
       </div>
       <span className="sr-only" aria-live="polite">
         Panel {selected + 1} of {slots.length}
