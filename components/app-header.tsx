@@ -10,7 +10,7 @@ export function AppHeader() {
           Tych
         </h1>
         <p className="panel-copy mt-3 max-w-[22rem]">
-          Make your own classic multi-image grid.
+          Make your own multi-image grid.
         </p>
       </div>
       <ThemeToggle />
