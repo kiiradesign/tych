@@ -166,12 +166,15 @@ export function TychProvider({ children }: { children: ReactNode }) {
 
   const clearSlot = useCallback((index: number) => {
     setSlots((prev) => {
-      const next = [...prev];
-      disposeSlot(next[index] ?? null);
-      next[index] = null;
-      return next;
+      disposeSlot(prev[index] ?? null);
+      const kept = prev.filter((_, i) => i !== index);
+      return [...kept, null];
     });
-    setCrops((prev) => prev.map((c, i) => (i === index ? { ...DEFAULT_CROP } : c)));
+    setCrops((prev) => {
+      const kept = prev.filter((_, i) => i !== index);
+      return [...kept, { ...DEFAULT_CROP }];
+    });
+    setSelected((current) => (current > index ? current - 1 : current));
   }, []);
 
   const value = useMemo<TychContextValue>(

@@ -6,8 +6,16 @@ import { useTych, useTychLayout } from "./tych-store";
 import { PanelCropper } from "./panel-cropper";
 
 export function CanvasStage() {
-  const { slots, crops, selected, setSelected, setCrop, addFiles, replaceSlot } =
-    useTych();
+  const {
+    slots,
+    crops,
+    selected,
+    setSelected,
+    setCrop,
+    addFiles,
+    replaceSlot,
+    clearSlot,
+  } = useTych();
   const layout = useTychLayout();
   const frameRef = useRef<HTMLDivElement>(null);
   const [cssPerPanelPx, setCssPerPanelPx] = useState(0);
@@ -49,13 +57,14 @@ export function CanvasStage() {
     >
       <div
         ref={frameRef}
-        className="relative w-full overflow-hidden rounded-[24px] bg-black"
+        className="tych-frame relative w-full"
         style={{ aspectRatio: `${layout.width} / ${layout.height}` }}
       >
+        <div className="pointer-events-none absolute inset-0 bg-background" aria-hidden />
         {cssPerPanelPx > 0
           ? layout.panels.map((panel, index) => (
               <PanelCropper
-                key={`${layout.count}-${layout.gap}-${index}`}
+                key={slots[index]?.id ?? `empty-${layout.count}-${index}`}
                 panel={panel}
                 image={slots[index] ?? null}
                 crop={crops[index]}
@@ -65,6 +74,7 @@ export function CanvasStage() {
                 onSelect={() => setSelected(index)}
                 onCrop={(crop: CropState) => setCrop(index, crop)}
                 onFiles={(files) => onReplace(index, files)}
+                onRemove={() => clearSlot(index)}
               />
             ))
           : null}

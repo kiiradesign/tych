@@ -15,6 +15,7 @@ export function PanelCropper({
   onSelect,
   onCrop,
   onFiles,
+  onRemove,
 }: {
   panel: Rect;
   image: SlotImage | null;
@@ -25,6 +26,7 @@ export function PanelCropper({
   onSelect: () => void;
   onCrop: (crop: CropState) => void;
   onFiles: (files: File[]) => void;
+  onRemove: () => void;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const pointer = useRef<{ id: number; x: number; y: number; crop: CropState } | null>(
@@ -122,19 +124,47 @@ export function PanelCropper({
       }}
     >
       {image && src ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={image.url}
-          alt=""
-          draggable={false}
-          className="pointer-events-none absolute max-w-none select-none"
-          style={{
-            width: image.width * displayScale,
-            height: image.height * displayScale,
-            left: -src.sx * displayScale,
-            top: -src.sy * displayScale,
-          }}
-        />
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={image.url}
+            alt=""
+            draggable={false}
+            className="pointer-events-none absolute max-w-none select-none"
+            style={{
+              width: image.width * displayScale,
+              height: image.height * displayScale,
+              left: -src.sx * displayScale,
+              top: -src.sy * displayScale,
+            }}
+          />
+          <button
+            type="button"
+            aria-label={`Remove photograph ${index + 1}`}
+            className="remove-photo geist-focus-visible absolute right-2 top-2 z-10 grid size-6 place-items-center rounded-full bg-black/55 text-white transition-transform duration-150 ease-out active:scale-95"
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+          >
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              aria-hidden
+            >
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </>
       ) : (
         <label className="flex h-full w-full cursor-pointer items-center justify-center bg-[#f2f2f2] dark:bg-[#171717]">
           <input
