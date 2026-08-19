@@ -7,7 +7,7 @@ import { Providers } from "@/components/providers";
 import { ThemedDialRoot } from "@/components/themed-dial-root";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tych.io"),
+  metadataBase: new URL("https://tych.kiira.in"),
   title: "Tych",
   description:
     "Recreate the classic Twitter polyptych as a single transparent PNG. Photographs never leave the browser.",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: "Tych",
     description:
       "Recreate the classic Twitter polyptych as a single transparent PNG. Photographs never leave the browser.",
-    url: "https://tych.io",
+    url: "https://tych.kiira.in",
     siteName: "Tych",
     type: "website",
     images: [
