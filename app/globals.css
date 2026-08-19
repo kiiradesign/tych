@@ -1,0 +1,324 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --border: #eaeaea;
+  --muted: #f2f2f2;
+  --muted-foreground: #4d4d4d;
+  --ring: #006bff;
+  --focus-gap: #ffffff;
+  --focus-ring: #006bff;
+  --radius: 6px;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #171717;
+  --sidebar-border: #eaeaea;
+
+  --panel-bg: #ffffff;
+  --panel-bg-strong: #ffffff;
+  --panel-border: #eaeaea;
+  --panel-shadow: none;
+  --panel-row-bg: #f2f2f2;
+  --panel-row-hover: #ebebeb;
+  --panel-row-active: #e6e6e6;
+  --panel-text-strong: #171717;
+  --panel-text-muted: #4d4d4d;
+  --panel-text-subtle: #8f8f8f;
+  --panel-handle: #171717;
+
+  --ease-out: cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  --checker-a: #efefef;
+  --checker-b: #ffffff;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #ededed;
+  --border: #2e2e2e;
+  --muted: #1a1a1a;
+  --muted-foreground: #a0a0a0;
+  --ring: #47a8ff;
+  --focus-gap: #000000;
+  --focus-ring: #47a8ff;
+  --sidebar: #000000;
+  --sidebar-foreground: #ededed;
+  --sidebar-border: #2e2e2e;
+
+  --panel-bg: #1a1a1a;
+  --panel-bg-strong: #1a1a1a;
+  --panel-border: #2e2e2e;
+  --panel-shadow: none;
+  --panel-row-bg: #1f1f1f;
+  --panel-row-hover: #292929;
+  --panel-row-active: #292929;
+  --panel-text-strong: #ededed;
+  --panel-text-muted: #a0a0a0;
+  --panel-text-subtle: #8f8f8f;
+  --panel-handle: #ededed;
+
+  --checker-a: #141414;
+  --checker-b: #1c1c1c;
+}
+
+.dialkit-root[data-theme="light"] {
+  --dial-surface: #f2f2f2;
+  --dial-surface-hover: #ebebeb;
+  --dial-surface-active: #e6e6e6;
+  --dial-surface-subtle: #eaeaea;
+  --dial-text-primary: #171717;
+  --dial-text-label: #4d4d4d;
+  --dial-text-secondary: #4d4d4d;
+  --dial-text-tertiary: #8f8f8f;
+  --dial-border: #eaeaea;
+  --dial-border-hover: #c9c9c9;
+  --dial-glass-bg: #ffffff;
+  --dial-dropdown-bg: #ffffff;
+  --dial-shadow: none;
+  --dial-radius: 8px;
+  --dial-row-height: 36px;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.dialkit-root[data-theme="dark"] {
+  --dial-surface: #1f1f1f;
+  --dial-surface-hover: #292929;
+  --dial-surface-active: #292929;
+  --dial-surface-subtle: #2e2e2e;
+  --dial-text-primary: #ededed;
+  --dial-text-label: #a0a0a0;
+  --dial-text-secondary: #a0a0a0;
+  --dial-text-tertiary: #8f8f8f;
+  --dial-border: #2e2e2e;
+  --dial-border-hover: #454545;
+  --dial-glass-bg: #1a1a1a;
+  --dial-dropdown-bg: #1a1a1a;
+  --dial-shadow: none;
+  --dial-radius: 8px;
+  --dial-row-height: 36px;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: light) {
+  .dialkit-root[data-theme="system"] {
+    --dial-surface: #f2f2f2;
+    --dial-surface-hover: #ebebeb;
+    --dial-surface-active: #e6e6e6;
+    --dial-surface-subtle: #eaeaea;
+    --dial-text-primary: #171717;
+    --dial-text-label: #4d4d4d;
+    --dial-text-secondary: #4d4d4d;
+    --dial-text-tertiary: #8f8f8f;
+    --dial-border: #eaeaea;
+    --dial-border-hover: #c9c9c9;
+    --dial-glass-bg: #ffffff;
+    --dial-dropdown-bg: #ffffff;
+    --dial-shadow: none;
+    --dial-radius: 8px;
+    --dial-row-height: 36px;
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .dialkit-root[data-theme="system"] {
+    --dial-surface: #1f1f1f;
+    --dial-surface-hover: #292929;
+    --dial-surface-active: #292929;
+    --dial-surface-subtle: #2e2e2e;
+    --dial-text-primary: #ededed;
+    --dial-text-label: #a0a0a0;
+    --dial-text-secondary: #a0a0a0;
+    --dial-text-tertiary: #8f8f8f;
+    --dial-border: #2e2e2e;
+    --dial-border-hover: #454545;
+    --dial-glass-bg: #1a1a1a;
+    --dial-dropdown-bg: #1a1a1a;
+    --dial-shadow: none;
+    --dial-radius: 8px;
+    --dial-row-height: 36px;
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html,
+  body {
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .panel-shell {
+    background: transparent;
+  }
+
+  .panel-card {
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    background: var(--panel-bg);
+    box-shadow: var(--panel-shadow);
+  }
+
+  .panel-kicker {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--panel-text-subtle);
+  }
+
+  .panel-copy {
+    color: var(--panel-text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .panel-title {
+    color: var(--panel-text-strong);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .panel-row {
+    min-height: 36px;
+    border-radius: 6px;
+    background: var(--panel-row-bg);
+    transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out);
+  }
+
+  .panel-row-value {
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    color: var(--panel-text-muted);
+  }
+
+  .panel-action {
+    min-height: 36px;
+    border-radius: 6px;
+    background: var(--panel-row-bg);
+    color: var(--panel-text-muted);
+    transition:
+      background-color 150ms var(--ease-out),
+      color 150ms var(--ease-out),
+      transform 150ms var(--ease-out);
+  }
+
+  .panel-action:active {
+    transform: scale(0.97);
+  }
+
+  .panel-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .panel-action-primary {
+    background: var(--panel-row-active);
+    color: var(--panel-text-strong);
+  }
+
+  .panel-field {
+    background: var(--panel-row-bg);
+    color: var(--panel-text-strong);
+  }
+
+  .panel-field:focus-visible,
+  .geist-focus-visible:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--focus-gap), 0 0 0 4px var(--focus-ring);
+  }
+
+  .checkerboard {
+    background-color: var(--checker-b);
+    background-image:
+      linear-gradient(45deg, var(--checker-a) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--checker-a) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--checker-a) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--checker-a) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  }
+
+  .btn-solid {
+    background: var(--foreground);
+    color: var(--background);
+    transition:
+      background-color 150ms var(--ease-out),
+      transform 150ms var(--ease-out),
+      opacity 150ms var(--ease-out);
+  }
+
+  .btn-solid:active {
+    transform: scale(0.97);
+  }
+
+  .btn-solid:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .credit-link {
+    transition: color 150ms var(--ease-out);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .panel-row:hover {
+    background: var(--panel-row-hover);
+  }
+
+  .panel-action:hover {
+    background: var(--panel-row-hover);
+    color: var(--panel-text-strong);
+  }
+
+  .panel-action-primary:hover {
+    background: var(--panel-row-active);
+  }
+
+  .segmented-idle:hover {
+    color: var(--panel-text-strong);
+  }
+
+  .count-idle:hover {
+    color: var(--panel-text-muted);
+  }
+
+  .credit-link:hover {
+    color: var(--foreground);
+  }
+
+  .btn-solid:hover:not(:disabled) {
+    background: #000000;
+  }
+
+  .dark .btn-solid:hover:not(:disabled) {
+    background: #ffffff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-property: background-color, color, opacity, border-color, box-shadow !important;
+  }
+}
