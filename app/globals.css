@@ -28,7 +28,9 @@
   --panel-text-subtle: #8f8f8f;
   --panel-handle: #171717;
 
-  --ease-out: cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --checker-a: #efefef;
   --checker-b: #ffffff;
 }
@@ -157,6 +159,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @layer components {
@@ -196,7 +203,7 @@
     min-height: 36px;
     border-radius: 6px;
     background: var(--panel-row-bg);
-    transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out);
+    transition: background-color 150ms var(--ease), transform 120ms var(--ease-out);
   }
 
   .panel-row-value {
@@ -213,9 +220,9 @@
     background: var(--panel-row-bg);
     color: var(--panel-text-muted);
     transition:
-      background-color 150ms var(--ease-out),
-      color 150ms var(--ease-out),
-      transform 150ms var(--ease-out);
+      background-color 150ms var(--ease),
+      color 150ms var(--ease),
+      transform 120ms var(--ease-out);
   }
 
   .panel-action:active {
@@ -259,9 +266,9 @@
     background: var(--foreground);
     color: var(--background);
     transition:
-      background-color 150ms var(--ease-out),
-      transform 150ms var(--ease-out),
-      opacity 150ms var(--ease-out);
+      background-color 150ms var(--ease),
+      transform 120ms var(--ease-out),
+      opacity 150ms var(--ease);
   }
 
   .btn-solid:active {
@@ -274,6 +281,27 @@
     transform: none;
   }
 
+  .btn-quiet {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--foreground);
+    transition:
+      background-color 150ms var(--ease),
+      border-color 150ms var(--ease),
+      transform 120ms var(--ease-out),
+      opacity 150ms var(--ease);
+  }
+
+  .btn-quiet:active {
+    transform: scale(0.97);
+  }
+
+  .btn-quiet:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
   .tych-frame {
     overflow: hidden;
     border-radius: 24px;
@@ -281,6 +309,24 @@
     transform: translateZ(0);
     -webkit-mask-image: linear-gradient(#fff, #fff);
     mask-image: linear-gradient(#fff, #fff);
+  }
+
+  .credit-link {
+    color: var(--foreground);
+    transition: color 150ms var(--ease);
+  }
+
+  .icon-button {
+    color: var(--foreground);
+    transition: color 150ms var(--ease), transform 120ms var(--ease-out);
+  }
+
+  .icon-button:active {
+    transform: scale(0.97);
+  }
+
+  .remove-photo {
+    transition: background-color 150ms var(--ease), transform 120ms var(--ease-out);
   }
 }
 
@@ -311,7 +357,11 @@
   }
 
   .credit-link:hover {
-    color: var(--foreground);
+    color: var(--panel-text-muted);
+  }
+
+  .icon-button:hover {
+    color: var(--panel-text-muted);
   }
 
   .btn-solid:hover:not(:disabled) {
@@ -320,6 +370,10 @@
 
   .dark .btn-solid:hover:not(:disabled) {
     background: #ffffff;
+  }
+
+  .btn-quiet:hover:not(:disabled) {
+    background: var(--muted);
   }
 }
 

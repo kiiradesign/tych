@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { getTychLayout } from "@/lib/layout";
+import { getTychLayout, panelCountFor } from "@/lib/layout";
 import { zoomAt } from "@/lib/crop";
 import { disposeSlot, loadSlotImage } from "@/lib/images";
 import {
@@ -53,10 +53,10 @@ function emptyCrops(count: PanelCount): CropState[] {
 }
 
 export function TychProvider({ children }: { children: ReactNode }) {
-  const [count, setCountState] = useState<PanelCount>(4);
+  const [count, setCountState] = useState<PanelCount>(2);
   const [gap, setGap] = useState<GapPx>(3);
-  const [slots, setSlots] = useState<Array<SlotImage | null>>(() => emptySlots(4));
-  const [crops, setCrops] = useState<CropState[]>(() => emptyCrops(4));
+  const [slots, setSlots] = useState<Array<SlotImage | null>>(() => emptySlots(2));
+  const [crops, setCrops] = useState<CropState[]>(() => emptyCrops(2));
   const [selected, setSelected] = useState(0);
   const [previewGround, setPreviewGround] = useState<PreviewGround>("checker");
   const [exporting, setExporting] = useState(false);
@@ -105,22 +105,41 @@ export function TychProvider({ children }: { children: ReactNode }) {
   const addFiles = useCallback(
     async (files: File[], startIndex?: number) => {
       setError(null);
-      const images = files.filter(Boolean);
-      if (images.length === 0) return;
+      const filled = slots.filter(Boolean).length;
+      const empty = filled === 0;
+      const remaining = 4 - filled;
+      const appending = startIndex === undefined && !empty;
 
-      const empty = slots.every((s) => !s);
-      const inferred =
-        empty && startIndex === undefined
-          ? (Math.min(4, Math.max(2, images.length)) as PanelCount)
-          : count;
+      if (appending && remaining <= 0) return;
+
+      const incoming = files
+        .filter(Boolean)
+        .slice(0, appending ? remaining : 4);
+      if (incoming.length === 0) return;
+
       const firstEmpty = slots.findIndex((s) => !s);
-      const begin = startIndex ?? (firstEmpty === -1 ? selected : firstEmpty);
+      let begin: number;
+      let targetCount: PanelCount;
+
+      if (startIndex !== undefined) {
+        begin = startIndex;
+        targetCount = panelCountFor(Math.min(4, startIndex + incoming.length));
+      } else if (empty) {
+        begin = 0;
+        targetCount = panelCountFor(incoming.length);
+      } else {
+        begin = firstEmpty === -1 ? filled : firstEmpty;
+        targetCount = panelCountFor(filled + incoming.length);
+      }
+
+      const toLoad = incoming.slice(0, Math.max(0, targetCount - begin));
+      if (toLoad.length === 0) return;
 
       try {
-        if (inferred !== count) setCountState(inferred);
+        if (targetCount !== count) setCountState(targetCount);
 
         const loaded = await Promise.all(
-          images.slice(0, Math.max(0, inferred - begin)).map(async (file, i) => ({
+          toLoad.map(async (file, i) => ({
             index: begin + i,
             image: await loadSlotImage(file),
           })),
@@ -128,10 +147,10 @@ export function TychProvider({ children }: { children: ReactNode }) {
 
         setSlots((prev) => {
           const next = Array.from(
-            { length: inferred },
+            { length: targetCount },
             (_, i) => prev[i] ?? null,
           );
-          prev.slice(inferred).forEach(disposeSlot);
+          prev.slice(targetCount).forEach(disposeSlot);
           for (const { index, image } of loaded) {
             disposeSlot(next[index] ?? null);
             next[index] = image;
@@ -140,7 +159,7 @@ export function TychProvider({ children }: { children: ReactNode }) {
         });
         setCrops((prev) => {
           const reset = new Set(loaded.map((item) => item.index));
-          return Array.from({ length: inferred }, (_, i) =>
+          return Array.from({ length: targetCount }, (_, i) =>
             reset.has(i) ? { ...DEFAULT_CROP } : (prev[i] ?? { ...DEFAULT_CROP }),
           );
         });
@@ -149,7 +168,7 @@ export function TychProvider({ children }: { children: ReactNode }) {
         setError(err instanceof Error ? err.message : "Could not read those files.");
       }
     },
-    [count, selected, slots],
+    [count, slots],
   );
 
   const replaceSlot = useCallback(

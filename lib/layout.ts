@@ -15,6 +15,12 @@ export function splitWithGap(total: number, gap: number): [number, number] {
   return [first, second];
 }
 
+export function panelCountFor(imageCount: number): PanelCount {
+  const n = Math.min(4, Math.max(1, imageCount));
+  if (n <= 2) return 2;
+  return n as PanelCount;
+}
+
 export function canvasSizeFor(count: PanelCount): { width: number; height: number } {
   switch (count) {
     case 2:

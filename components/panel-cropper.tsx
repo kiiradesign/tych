@@ -141,7 +141,7 @@ export function PanelCropper({
           <button
             type="button"
             aria-label={`Remove photograph ${index + 1}`}
-            className="remove-photo geist-focus-visible absolute right-2 top-2 z-10 grid size-6 place-items-center rounded-full bg-black/55 text-white transition-transform duration-150 ease-out active:scale-95"
+            className="remove-photo geist-focus-visible absolute right-2 top-2 z-10 grid size-6 place-items-center rounded-full bg-black/55 text-white active:scale-[0.97]"
             onPointerDown={(e) => {
               e.stopPropagation();
               e.preventDefault();

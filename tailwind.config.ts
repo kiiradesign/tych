@@ -32,6 +32,7 @@ const config: Config = {
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
       },
       transitionTimingFunction: {
+        DEFAULT: "var(--ease)",
         out: "var(--ease-out)",
       },
     },

@@ -1,11 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/cn";
-import type { PanelCount } from "@/lib/types";
+import { useRef } from "react";
 import { exportTychPng } from "@/lib/export";
 import { useTych } from "./tych-store";
-
-const COUNTS: PanelCount[] = [2, 3, 4];
 
 export function AppToolbar() {
   const {
@@ -15,12 +12,14 @@ export function AppToolbar() {
     crops,
     exporting,
     error,
-    setCount,
+    addFiles,
     setExporting,
     setError,
   } = useTych();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const ready = slots.length === count && slots.every(Boolean);
+  const atMax = slots.filter(Boolean).length >= 4;
 
   async function onSave() {
     if (!ready || exporting) return;
@@ -39,32 +38,26 @@ export function AppToolbar() {
   return (
     <div className="mt-6">
       <div className="flex items-center justify-between gap-4">
-        <div
-          role="radiogroup"
-          aria-label="Number of images"
-          className="flex items-center"
+        <button
+          type="button"
+          disabled={exporting || atMax}
+          onClick={() => inputRef.current?.click()}
+          className="btn-quiet geist-focus-visible h-10 rounded-[8px] px-4 text-[14px] font-medium"
         >
-          {COUNTS.map((n) => {
-            const active = count === n;
-            return (
-              <button
-                key={n}
-                type="button"
-                role="radio"
-                aria-checked={active}
-                onClick={() => setCount(n)}
-                className={cn(
-                  "geist-focus-visible h-10 min-w-10 rounded-[6px] text-[14px] font-medium transition-colors duration-150 ease-out",
-                  active
-                    ? "text-foreground"
-                    : "count-idle text-[var(--panel-text-subtle)]",
-                )}
-              >
-                {n}
-              </button>
-            );
-          })}
-        </div>
+          Add images
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            const files = [...(e.target.files ?? [])];
+            e.target.value = "";
+            if (files.length) void addFiles(files);
+          }}
+        />
         <button
           type="button"
           disabled={!ready || exporting}

@@ -20,13 +20,13 @@ export function ThemeToggle() {
       type="button"
       aria-label={isDark ? "Switch to light" : "Switch to dark"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="geist-focus-visible grid size-8 place-items-center rounded-[6px] text-foreground transition-transform duration-150 ease-out active:scale-95"
+      className="icon-button geist-focus-visible -mr-1 grid size-8 place-items-center rounded-[6px]"
     >
       {mounted ? (
         <MorphIcon
           icon={isDark ? Moon : Sun}
-          size={18}
-          strokeWidth={1.75}
+          size={20}
+          strokeWidth={1.5}
           spring="snappy"
           reducedMotion="user"
         />
