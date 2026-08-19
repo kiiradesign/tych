@@ -3,7 +3,9 @@
 import { useEffect, useRef } from "react";
 import { getSourceRect, panFromDrag, zoomAt } from "@/lib/crop";
 import { cn } from "@/lib/cn";
+import { IMAGE_ACCEPT } from "@/lib/images";
 import type { CropState, Rect, SlotImage } from "@/lib/types";
+import { LisseButton } from "./lisse-button";
 
 export function PanelCropper({
   panel,
@@ -138,10 +140,11 @@ export function PanelCropper({
               top: -src.sy * displayScale,
             }}
           />
-          <button
-            type="button"
+          <LisseButton
+            radius={12}
             aria-label={`Remove photograph ${index + 1}`}
-            className="remove-photo geist-focus-visible absolute right-2 top-2 z-10 grid size-6 place-items-center rounded-full bg-black/55 text-white active:scale-[0.97]"
+            wrapClassName="absolute right-2 top-2 z-10"
+            className="remove-photo grid size-6 place-items-center bg-black/55 text-white active:scale-[0.97]"
             onPointerDown={(e) => {
               e.stopPropagation();
               e.preventDefault();
@@ -163,13 +166,13 @@ export function PanelCropper({
             >
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
-          </button>
+          </LisseButton>
         </>
       ) : (
         <label className="flex h-full w-full cursor-pointer items-center justify-center bg-[#f2f2f2] dark:bg-[#171717]">
           <input
             type="file"
-            accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+            accept={IMAGE_ACCEPT}
             className="sr-only"
             onChange={(e) => {
               const files = [...(e.target.files ?? [])];

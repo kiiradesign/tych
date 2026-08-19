@@ -4,6 +4,7 @@ import { MorphIcon } from "morphicons/react";
 import { Moon, Sun } from "lucide";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { LisseButton } from "./lisse-button";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -16,11 +17,12 @@ export function ThemeToggle() {
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
-    <button
-      type="button"
+    <LisseButton
+      radius={6}
       aria-label={isDark ? "Switch to light" : "Switch to dark"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="icon-button geist-focus-visible -mr-1 grid size-8 place-items-center rounded-[6px]"
+      wrapClassName="-mr-1"
+      className="icon-button grid size-8 place-items-center"
     >
       {mounted ? (
         <MorphIcon
@@ -33,6 +35,6 @@ export function ThemeToggle() {
       ) : (
         <span className="size-[18px]" />
       )}
-    </button>
+    </LisseButton>
   );
 }

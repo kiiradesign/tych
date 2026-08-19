@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 import { exportTychPng } from "@/lib/export";
+import { IMAGE_ACCEPT } from "@/lib/images";
+import { LisseButton } from "./lisse-button";
 import { useTych } from "./tych-store";
 
 export function AppToolbar() {
@@ -38,18 +40,19 @@ export function AppToolbar() {
   return (
     <div className="mt-6">
       <div className="flex items-center justify-between gap-4">
-        <button
-          type="button"
+        <LisseButton
+          radius={8}
+          autoEffects
           disabled={exporting || atMax}
           onClick={() => inputRef.current?.click()}
-          className="btn-quiet geist-focus-visible h-10 rounded-[8px] px-4 text-[14px] font-medium"
+          className="btn-quiet h-10 px-4 text-[14px] font-medium"
         >
           Add images
-        </button>
+        </LisseButton>
         <input
           ref={inputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+          accept={IMAGE_ACCEPT}
           multiple
           className="hidden"
           onChange={(e) => {
@@ -58,14 +61,14 @@ export function AppToolbar() {
             if (files.length) void addFiles(files);
           }}
         />
-        <button
-          type="button"
+        <LisseButton
+          radius={8}
           disabled={!ready || exporting}
           onClick={() => void onSave()}
-          className="btn-solid geist-focus-visible h-10 rounded-[8px] px-5 text-[14px] font-medium"
+          className="btn-solid h-10 px-5 text-[14px] font-medium"
         >
           {exporting ? "Saving…" : "Save"}
-        </button>
+        </LisseButton>
       </div>
       {error ? (
         <p className="mt-3 text-[13px] text-[var(--panel-text-muted)]">{error}</p>

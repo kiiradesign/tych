@@ -304,11 +304,17 @@
 
   .tych-frame {
     overflow: hidden;
-    border-radius: 24px;
     isolation: isolate;
     transform: translateZ(0);
-    -webkit-mask-image: linear-gradient(#fff, #fff);
-    mask-image: linear-gradient(#fff, #fff);
+  }
+
+  .lisse-focus {
+    display: inline-flex;
+    position: relative;
+  }
+
+  .lisse-focus:has(:focus-visible) {
+    box-shadow: 0 0 0 2px var(--focus-gap), 0 0 0 4px var(--focus-ring);
   }
 
   .credit-link {

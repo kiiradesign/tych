@@ -1,6 +1,8 @@
 "use client";
 
+import { useSmoothCorners } from "@lisse/react";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { LISSE_SMOOTHING } from "@/lib/lisse";
 import type { CropState } from "@/lib/types";
 import { useTych, useTychLayout } from "./tych-store";
 import { PanelCropper } from "./panel-cropper";
@@ -19,6 +21,12 @@ export function CanvasStage() {
   const layout = useTychLayout();
   const frameRef = useRef<HTMLDivElement>(null);
   const [cssPerPanelPx, setCssPerPanelPx] = useState(0);
+
+  useSmoothCorners(
+    frameRef,
+    { radius: 24, smoothing: LISSE_SMOOTHING },
+    { autoEffects: false, fallbackBorderRadius: "24px" },
+  );
 
   useLayoutEffect(() => {
     const el = frameRef.current;
@@ -58,7 +66,10 @@ export function CanvasStage() {
       <div
         ref={frameRef}
         className="tych-frame relative w-full"
-        style={{ aspectRatio: `${layout.width} / ${layout.height}` }}
+        style={{
+          aspectRatio: `${layout.width} / ${layout.height}`,
+          borderRadius: 24,
+        }}
       >
         <div className="pointer-events-none absolute inset-0 bg-background" aria-hidden />
         {cssPerPanelPx > 0

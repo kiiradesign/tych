@@ -9,12 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@lisse/react": "^0.7.1",
     "@phosphor-icons/react": "^2.1.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dialkit": "^1.4.3",
     "framer-motion": "^12.23.12",
     "geist": "^1.4.2",
+    "heic-to": "^1.5.2",
     "lucide": "^1.33.0",
     "morphicons": "^1.7.0",
     "motion": "^12.23.12",
