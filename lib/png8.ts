@@ -301,6 +301,12 @@ function isAppleTouchDevice() {
   );
 }
 
+function isMobileSave() {
+  return (
+    /Android/i.test(navigator.userAgent) || isAppleTouchDevice()
+  );
+}
+
 async function shareImageFile(
   blob: Blob,
   filename: string,
@@ -326,28 +332,23 @@ function openBlobTab(blob: Blob) {
   window.setTimeout(() => URL.revokeObjectURL(url), 120_000);
 }
 
-function triggerAnchorDownload(blob: Blob, filename: string) {
+export async function downloadBlob(blob: Blob, filename: string) {
+  if (isMobileSave()) {
+    const result = await shareImageFile(blob, filename, blob.type || "image/png");
+    if (result === "shared" || result === "cancelled") return;
+    if (isAppleTouchDevice()) {
+      openBlobTab(blob);
+      return;
+    }
+  }
+
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.rel = "noopener";
-  a.style.display = "none";
   document.body.appendChild(a);
   a.click();
   a.remove();
-  const iframe = document.createElement("iframe");
-  iframe.style.display = "none";
-  iframe.src = url;
-  document.body.appendChild(iframe);
-  window.setTimeout(() => iframe.remove(), 30_000);
-  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
-}
-
-export async function downloadBlob(blob: Blob, filename: string) {
-  const type = blob.type || "image/png";
-  const result = await shareImageFile(blob, filename, type);
-  if (result === "shared" || result === "cancelled") return;
-  if (isAppleTouchDevice()) openBlobTab(blob);
-  else triggerAnchorDownload(blob, filename);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
