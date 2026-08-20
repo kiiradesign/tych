@@ -95,8 +95,9 @@ export function PanelSlot({
         width: panel.w * cssPerPanelPx,
         height: panel.h * cssPerPanelPx,
         touchAction: "none",
-        transform: slotTransform(shiftX, shiftY),
-        zIndex: dragging ? 2 : shiftX || shiftY ? 3 : undefined,
+        WebkitUserSelect: "none",
+        transform: dragging ? undefined : slotTransform(shiftX, shiftY),
+        zIndex: dragging ? 12 : shiftX || shiftY ? 3 : undefined,
       }}
     >
       {image && src ? (

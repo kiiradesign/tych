@@ -255,6 +255,17 @@
     transform: translateZ(0);
   }
 
+  .tych-frame-shell[data-reordering],
+  .tych-frame[data-reordering] {
+    overflow: visible;
+  }
+
+  .panel-slot img {
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+
   .lisse-focus {
     display: inline-flex;
     position: relative;
@@ -295,30 +306,13 @@
   }
 
   .panel-slot[data-lifted="true"] {
-    opacity: 0;
-    pointer-events: auto;
+    z-index: 12;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.2);
     transition: none;
   }
 
   .tych-frame[data-settling] .panel-slot {
     transition: none;
-  }
-
-  .reorder-ghost {
-    pointer-events: none;
-    position: fixed;
-    z-index: 40;
-    overflow: hidden;
-    will-change: transform;
-  }
-
-  .reorder-ghost-inner {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    transform: scale(1.02);
-    transform-origin: center;
-    box-shadow: 0 8px 20px rgb(0 0 0 / 0.2);
   }
 }
 

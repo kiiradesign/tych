@@ -8,11 +8,10 @@ import {
   useRef,
   useState,
 } from "react";
-import { createPortal, flushSync } from "react-dom";
+import { flushSync } from "react-dom";
 import { useSmoothCorners } from "@lisse/react";
-import { getSourceRect } from "@/lib/crop";
 import { LISSE_SMOOTHING } from "@/lib/lisse";
-import type { CropState, Rect, SlotImage } from "@/lib/types";
+import type { Rect } from "@/lib/types";
 import { CropModal } from "./crop-modal";
 import { PanelSlot } from "./panel-cropper";
 import { useTych, useTychLayout } from "./tych-store";
@@ -68,29 +67,20 @@ export function CanvasStage() {
   } = useTych();
   const layout = useTychLayout();
   const frameRef = useRef<HTMLDivElement>(null);
-  const ghostRef = useRef<HTMLDivElement>(null);
   const [cssPerPanelPx, setCssPerPanelPx] = useState(0);
   const [cropping, setCropping] = useState<number | null>(null);
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const [dragOver, setDragOver] = useState<number | null>(null);
-  const [ghost, setGhost] = useState<{
-    image: SlotImage;
-    crop: CropState;
-    panel: Rect;
-    w: number;
-    h: number;
-  } | null>(null);
   const drag = useRef<{
     from: number;
     x: number;
     y: number;
     pointerId: number;
     moved: boolean;
-    originX: number;
-    originY: number;
-    ghostX: number;
-    ghostY: number;
+    dx: number;
+    dy: number;
     over: number;
+    el: HTMLDivElement;
   } | null>(null);
 
   const shifts = useMemo(
@@ -123,16 +113,24 @@ export function CanvasStage() {
     return () => ro.disconnect();
   }, [layout.width]);
 
-  function placeGhost(x: number, y: number) {
-    const el = ghostRef.current;
-    if (el) el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  function followSlot() {
+    const session = drag.current;
+    if (!session?.moved) return;
+    session.el.style.transition = "none";
+    session.el.style.transform = `translate3d(${session.dx}px, ${session.dy}px, 0) scale(1.02)`;
+    session.el.style.zIndex = "12";
   }
 
   const clearDragState = useCallback(() => {
+    const el = drag.current?.el;
+    if (el) {
+      el.style.removeProperty("transition");
+      el.style.removeProperty("transform");
+      el.style.removeProperty("z-index");
+    }
     drag.current = null;
     setDragFrom(null);
     setDragOver(null);
-    setGhost(null);
     document.body.style.removeProperty("cursor");
   }, []);
 
@@ -156,19 +154,18 @@ export function CanvasStage() {
   const onSlotPointerDown = useCallback(
     (index: number, e: React.PointerEvent<HTMLDivElement>) => {
       if (!slots[index] || cropping !== null) return;
+      e.preventDefault();
       e.currentTarget.setPointerCapture(e.pointerId);
-      const rect = e.currentTarget.getBoundingClientRect();
       drag.current = {
         from: index,
         x: e.clientX,
         y: e.clientY,
         pointerId: e.pointerId,
         moved: false,
-        originX: rect.left,
-        originY: rect.top,
-        ghostX: rect.left,
-        ghostY: rect.top,
+        dx: 0,
+        dy: 0,
         over: index,
+        el: e.currentTarget,
       };
     },
     [cropping, slots],
@@ -181,29 +178,17 @@ export function CanvasStage() {
       const dist = Math.hypot(e.clientX - session.x, e.clientY - session.y);
       if (!session.moved && dist < DRAG_THRESHOLD) return;
 
-      const ghostX = session.originX + (e.clientX - session.x);
-      const ghostY = session.originY + (e.clientY - session.y);
-      session.ghostX = ghostX;
-      session.ghostY = ghostY;
+      session.dx = e.clientX - session.x;
+      session.dy = e.clientY - session.y;
 
       if (!session.moved) {
         session.moved = true;
-        const image = slots[session.from];
-        const panel = layout.panels[session.from];
-        if (!image || !panel) return;
         document.body.style.cursor = "grabbing";
         setDragFrom(session.from);
         setDragOver(session.from);
-        setGhost({
-          image,
-          crop: crops[session.from],
-          panel,
-          w: e.currentTarget.getBoundingClientRect().width,
-          h: e.currentTarget.getBoundingClientRect().height,
-        });
       }
 
-      placeGhost(ghostX, ghostY);
+      followSlot();
 
       const frame = frameRef.current;
       if (!frame || cssPerPanelPx <= 0) return;
@@ -218,7 +203,7 @@ export function CanvasStage() {
       session.over = hit;
       setDragOver(hit);
     },
-    [crops, cssPerPanelPx, layout.panels, slots],
+    [cssPerPanelPx, layout.panels],
   );
 
   const onSlotPointerUp = useCallback(
@@ -237,13 +222,15 @@ export function CanvasStage() {
       }
 
       if (frame) frame.dataset.settling = "";
+      drag.current = null;
       flushSync(() => {
         if (over !== from) moveSlot(from, over);
         setDragFrom(null);
         setDragOver(null);
-        setGhost(null);
       });
-      drag.current = null;
+      session.el.style.removeProperty("transition");
+      session.el.style.removeProperty("transform");
+      session.el.style.removeProperty("z-index");
       document.body.style.removeProperty("cursor");
       requestAnimationFrame(() => {
         if (frame) delete frame.dataset.settling;
@@ -253,10 +240,8 @@ export function CanvasStage() {
   );
 
   useLayoutEffect(() => {
-    const session = drag.current;
-    if (!ghost || !session?.moved) return;
-    placeGhost(session.ghostX, session.ghostY);
-  }, [ghost]);
+    followSlot();
+  });
 
   useEffect(() => {
     if (cropping !== null && !slots[cropping]) setCropping(null);
@@ -266,20 +251,20 @@ export function CanvasStage() {
     cropping !== null ? (slots[cropping] ?? null) : null;
   const croppingPanel =
     cropping !== null ? layout.panels[cropping] : null;
-  const ghostSrc = ghost
-    ? getSourceRect(ghost.image.width, ghost.image.height, ghost.panel, ghost.crop)
-    : null;
-  const ghostScale = ghost && ghostSrc ? ghost.w / ghostSrc.sw : 1;
 
   return (
     <section
       onDragOver={(e) => e.preventDefault()}
       onDrop={onStageDrop}
     >
-      <div className="tych-frame-shell">
+      <div
+        className="tych-frame-shell"
+        data-reordering={dragFrom !== null ? "" : undefined}
+      >
         <div
           ref={frameRef}
           className="tych-frame relative w-full"
+          data-reordering={dragFrom !== null ? "" : undefined}
           style={{
             aspectRatio: `${layout.width} / ${layout.height}`,
             borderRadius: 24,
@@ -313,36 +298,6 @@ export function CanvasStage() {
             : null}
         </div>
       </div>
-      {ghost && ghostSrc && typeof document !== "undefined"
-        ? createPortal(
-            <div
-              ref={ghostRef}
-              className="reorder-ghost"
-              style={{
-                width: ghost.w,
-                height: ghost.h,
-                transform: `translate3d(${drag.current?.ghostX ?? 0}px, ${drag.current?.ghostY ?? 0}px, 0)`,
-              }}
-            >
-              <div className="reorder-ghost-inner">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={ghost.image.url}
-                  alt=""
-                  draggable={false}
-                  className="absolute max-w-none select-none"
-                  style={{
-                    width: ghost.image.width * ghostScale,
-                    height: ghost.image.height * ghostScale,
-                    left: -ghostSrc.sx * ghostScale,
-                    top: -ghostSrc.sy * ghostScale,
-                  }}
-                />
-              </div>
-            </div>,
-            document.body,
-          )
-        : null}
       {cropping !== null && croppingImage && croppingPanel ? (
         <CropModal
           image={croppingImage}
