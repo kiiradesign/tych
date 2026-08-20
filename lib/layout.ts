@@ -5,8 +5,7 @@ import { PREVIEW_HEIGHT, PREVIEW_WIDTH } from "./types";
  * Integer split of `total` into two parts separated by `gap`.
  *
  * When `total - gap` is odd, the leftover pixel goes to the first part
- * (left or top). That matches the community 2-up example:
- * 449 + 3 + 448 = 900.
+ * (left or top). At 4 px: `448 + 4 + 448 = 900`.
  */
 export function splitWithGap(total: number, gap: number): [number, number] {
   const inner = total - gap;

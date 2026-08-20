@@ -15,16 +15,6 @@ export function TychApp() {
             <CanvasStage />
             <AppToolbar />
           </main>
-          <footer className="pt-6 text-center">
-            <a
-              href="https://x.com/kiiradesign"
-              target="_blank"
-              rel="noreferrer"
-              className="credit-link"
-            >
-              Made by @kiiradesign
-            </a>
-          </footer>
         </div>
       </div>
     </TychProvider>

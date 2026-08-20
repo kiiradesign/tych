@@ -1,5 +1,5 @@
 export type PanelCount = 2 | 3 | 4;
-export type GapPx = 2 | 3;
+export type GapPx = 4;
 export type PreviewGround = "checker" | "light" | "dark";
 
 export type Rect = {

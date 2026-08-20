@@ -11,6 +11,14 @@ export function AppHeader() {
           Make image grids for X(Twitter) posts.
         </p>
       </div>
+      <a
+        href="https://x.com/kiiradesign"
+        target="_blank"
+        rel="noreferrer"
+        className="credit-link shrink-0 pt-2"
+      >
+        @kiiradesign
+      </a>
     </header>
   );
 }

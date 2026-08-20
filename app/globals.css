@@ -285,8 +285,40 @@
     transform: scale(0.97);
   }
 
-  .remove-photo {
-    transition: background-color 150ms var(--ease), transform 150ms var(--ease-out);
+  .crop-modal-root {
+    isolation: isolate;
+  }
+
+  .panel-slot {
+    z-index: 1;
+    transition: transform 200ms var(--ease);
+  }
+
+  .panel-slot[data-lifted="true"] {
+    opacity: 0;
+    pointer-events: auto;
+    transition: none;
+  }
+
+  .tych-frame[data-settling] .panel-slot {
+    transition: none;
+  }
+
+  .reorder-ghost {
+    pointer-events: none;
+    position: fixed;
+    z-index: 40;
+    overflow: hidden;
+    will-change: transform;
+  }
+
+  .reorder-ghost-inner {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    transform: scale(1.02);
+    transform-origin: center;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.2);
   }
 }
 

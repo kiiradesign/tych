@@ -26,7 +26,7 @@ Tych brings the visual result back as a single postable image.
   - **2 images** → side-by-side
   - **3 images** → one large left + two stacked right
   - **4 images** → clean 2×2
-- Black gutters (default **3 px**, optional 2 px)
+- Black gutters (**4 px**)
 - Sharp rectangular outer edges (no artificial rounding)
 - Full-color PNG export under **5 MB**, resolution taken from your photos
 - Fully client-side — images never leave your browser
@@ -38,10 +38,10 @@ Tych brings the visual result back as a single postable image.
 
 Layouts match the classic 2-, 3-, and 4-up proportions (the preview is 900 × 506). The downloaded PNG is scaled up from the pixels in your crops, then reduced only if needed to stay under 5 MB.
 
-Gaps between panels are opaque black (default 3 px at preview size, scaled with the export).
+Gaps between panels are opaque black (**4 px** at preview size, scaled with the export).
 
 Integer rounding: when a split is odd, the leftover pixel goes to the left / top pane
-(`449 + 3 + 448 = 900` at preview size).
+(`448 + 4 + 448 = 900` at preview size).
 
 ---
 

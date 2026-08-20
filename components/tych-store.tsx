@@ -41,6 +41,7 @@ type TychContextValue = {
   replaceAll: (files: File[]) => Promise<void>;
   replaceSlot: (index: number, file: File) => Promise<void>;
   clearSlot: (index: number) => void;
+  moveSlot: (from: number, to: number) => void;
   setExporting: (value: boolean) => void;
   setError: (message: string | null) => void;
 };
@@ -55,9 +56,21 @@ function emptyCrops(count: PanelCount): CropState[] {
   return Array.from({ length: count }, () => ({ ...DEFAULT_CROP }));
 }
 
+function swapIndex<T>(items: T[], from: number, to: number): T[] {
+  if (from === to) return items;
+  if (from < 0 || to < 0 || from >= items.length || to >= items.length) {
+    return items;
+  }
+  const next = [...items];
+  const temp = next[from];
+  next[from] = next[to];
+  next[to] = temp;
+  return next;
+}
+
 export function TychProvider({ children }: { children: ReactNode }) {
   const [count, setCountState] = useState<PanelCount>(4);
-  const [gap, setGap] = useState<GapPx>(3);
+  const [gap, setGap] = useState<GapPx>(4);
   const [slots, setSlots] = useState<Array<SlotImage | null>>(() => emptySlots(4));
   const [crops, setCrops] = useState<CropState[]>(() => emptyCrops(4));
   const [selected, setSelected] = useState(0);
@@ -250,6 +263,13 @@ export function TychProvider({ children }: { children: ReactNode }) {
     [placeFile],
   );
 
+  const moveSlot = useCallback((from: number, to: number) => {
+    if (from === to) return;
+    setSlots((prev) => swapIndex(prev, from, to));
+    setCrops((prev) => swapIndex(prev, from, to));
+    setSelected(to);
+  }, []);
+
   const clearSlot = useCallback(
     (index: number) => {
       disposeSlot(slots[index] ?? null);
@@ -297,6 +317,7 @@ export function TychProvider({ children }: { children: ReactNode }) {
       replaceAll,
       replaceSlot,
       clearSlot,
+      moveSlot,
       setExporting,
       setError,
     }),
@@ -304,6 +325,7 @@ export function TychProvider({ children }: { children: ReactNode }) {
       addFiles,
       replaceAll,
       clearSlot,
+      moveSlot,
       count,
       crops,
       error,

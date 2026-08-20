@@ -1,100 +1,71 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { getSourceRect, panFromDrag, zoomAt } from "@/lib/crop";
+import { useRef } from "react";
+import { getSourceRect } from "@/lib/crop";
 import { cn } from "@/lib/cn";
 import { IMAGE_ACCEPT } from "@/lib/images";
 import type { CropState, Rect, SlotImage } from "@/lib/types";
 import { LisseButton } from "./lisse-button";
 
-export function PanelCropper({
+function slotTransform(shiftX: number, shiftY: number) {
+  return `translate3d(${shiftX}px, ${shiftY}px, 0)`;
+}
+
+export function PanelSlot({
   panel,
   image,
   crop,
-  selected,
   index,
   cssPerPanelPx,
-  onSelect,
-  onCrop,
+  dragging,
+  hideChrome,
+  shiftX,
+  shiftY,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+  onPointerCancel,
+  onActivate,
   onFiles,
   onRemove,
 }: {
   panel: Rect;
   image: SlotImage | null;
   crop: CropState;
-  selected: boolean;
   index: number;
   cssPerPanelPx: number;
-  onSelect: () => void;
-  onCrop: (crop: CropState) => void;
+  dragging: boolean;
+  hideChrome: boolean;
+  shiftX: number;
+  shiftY: number;
+  onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerMove: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerUp: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerCancel: () => void;
+  onActivate: () => void;
   onFiles: (files: File[]) => void;
   onRemove: () => void;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const pointer = useRef<{ id: number; x: number; y: number; crop: CropState } | null>(
-    null,
-  );
-  const cropRef = useRef(crop);
-  cropRef.current = crop;
-
   const src = image
     ? getSourceRect(image.width, image.height, panel, crop)
     : null;
   const displayScale = src ? (panel.w * cssPerPanelPx) / src.sw : 1;
-
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el || !image) return;
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.08 : 0.08;
-      onCrop(zoomAt(cropRef.current, cropRef.current.zoom + delta));
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, [image, onCrop]);
 
   return (
     <div
       ref={rootRef}
       role="button"
       tabIndex={0}
-      aria-label={image ? `Crop panel ${index + 1}` : `Add photograph ${index + 1}`}
-      onPointerDown={(e) => {
-        onSelect();
-        if (!image) return;
-        e.currentTarget.setPointerCapture(e.pointerId);
-        pointer.current = {
-          id: e.pointerId,
-          x: e.clientX,
-          y: e.clientY,
-          crop: cropRef.current,
-        };
-      }}
-      onPointerMove={(e) => {
-        if (!pointer.current || pointer.current.id !== e.pointerId || !image) return;
-        const dx = e.clientX - pointer.current.x;
-        const dy = e.clientY - pointer.current.y;
-        pointer.current.x = e.clientX;
-        pointer.current.y = e.clientY;
-        const next = panFromDrag(
-          pointer.current.crop,
-          image.width,
-          image.height,
-          panel,
-          dx,
-          dy,
-          cssPerPanelPx,
-        );
-        pointer.current.crop = next;
-        onCrop(next);
-      }}
-      onPointerUp={(e) => {
-        if (pointer.current?.id === e.pointerId) pointer.current = null;
-      }}
-      onPointerCancel={() => {
-        pointer.current = null;
-      }}
+      aria-label={
+        image
+          ? `Photograph ${index + 1}. Drag to reorder, tap to crop.`
+          : `Add photograph ${index + 1}`
+      }
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
       onDragOver={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -108,21 +79,24 @@ export function PanelCropper({
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          onSelect();
           if (!image) rootRef.current?.querySelector("input")?.click();
+          else onActivate();
         }
       }}
       className={cn(
-        "absolute overflow-hidden outline-none",
-        image ? "cursor-grab active:cursor-grabbing" : "cursor-pointer",
-        selected && image && "ring-1 ring-inset ring-white/40",
+        "panel-slot absolute overflow-hidden outline-none",
+        image ? "cursor-grab" : "cursor-pointer",
+        dragging && "cursor-grabbing",
       )}
+      data-lifted={dragging ? "true" : undefined}
       style={{
         left: panel.x * cssPerPanelPx,
         top: panel.y * cssPerPanelPx,
         width: panel.w * cssPerPanelPx,
         height: panel.h * cssPerPanelPx,
         touchAction: "none",
+        transform: slotTransform(shiftX, shiftY),
+        zIndex: dragging ? 2 : shiftX || shiftY ? 3 : undefined,
       }}
     >
       {image && src ? (
@@ -140,7 +114,8 @@ export function PanelCropper({
               top: -src.sy * displayScale,
             }}
           />
-          <LisseButton
+          {hideChrome ? null : (
+            <LisseButton
             radius={12}
             aria-label={`Remove photograph ${index + 1}`}
             wrapClassName="absolute right-2 top-2 z-10"
@@ -167,6 +142,7 @@ export function PanelCropper({
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </LisseButton>
+          )}
         </>
       ) : (
         <label className="flex h-full w-full cursor-pointer items-center justify-center bg-muted">
