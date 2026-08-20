@@ -48,7 +48,7 @@ export function AppToolbar() {
           type="button"
           disabled={exporting}
           onClick={() => inputRef.current?.click()}
-          className="btn-quiet geist-focus-visible h-10 px-3 text-[14px] font-medium"
+          className="btn-quiet geist-focus-visible px-3 text-[14px] font-medium"
         >
           {atMax ? "Replace images" : "Add images"}
         </button>
@@ -70,7 +70,7 @@ export function AppToolbar() {
           radius={6}
           disabled={!ready || exporting}
           onClick={() => void onSave()}
-          className="btn-solid h-10 px-3 text-[14px] font-medium"
+          className="btn-solid px-3 text-[14px] font-medium"
         >
           {exporting ? "Saving…" : "Save"}
         </LisseButton>

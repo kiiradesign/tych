@@ -22,7 +22,7 @@ export function ThemeToggle() {
       aria-label={isDark ? "Switch to light" : "Switch to dark"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
       wrapClassName="-mr-1"
-      className="icon-button grid size-8 place-items-center"
+      className="icon-button geist-focus-visible grid size-9 place-items-center"
     >
       {mounted ? (
         <MorphIcon

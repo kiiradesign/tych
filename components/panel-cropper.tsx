@@ -169,7 +169,7 @@ export function PanelCropper({
           </LisseButton>
         </>
       ) : (
-        <label className="flex h-full w-full cursor-pointer items-center justify-center bg-[#f2f2f2] dark:bg-[#171717]">
+        <label className="flex h-full w-full cursor-pointer items-center justify-center bg-muted">
           <input
             type="file"
             accept={IMAGE_ACCEPT}

@@ -8,7 +8,7 @@ import { AppToolbar } from "./app-toolbar";
 export function TychApp() {
   return (
     <TychProvider>
-      <div className="min-h-dvh bg-background">
+      <div className="min-h-dvh bg-[var(--ds-background-200)] text-[var(--ds-gray-1000)]">
         <div className="mx-auto flex min-h-dvh max-w-[720px] flex-col px-6 py-6 sm:px-8 sm:py-8">
           <AppHeader />
           <main className="flex flex-1 flex-col justify-center py-10 sm:py-14">

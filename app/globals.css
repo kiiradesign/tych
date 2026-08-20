@@ -3,147 +3,81 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --border: #eaeaea;
-  --border-hover: #c9c9c9;
-  --muted: #f2f2f2;
-  --muted-foreground: #4d4d4d;
-  --ring: #006bff;
-  --focus-gap: #ffffff;
-  --focus-ring: #006bff;
+  color-scheme: light;
+  --ds-background-100: light-dark(oklch(1 0 0), oklch(0 0 0));
+  --ds-background-200: light-dark(oklch(0.984 0 0), oklch(0.027 0 0));
+  --ds-gray-100: light-dark(oklch(0.961 0 0), oklch(0.218 0 0));
+  --ds-gray-200: light-dark(oklch(0.94 0 0), oklch(0.239 0 0));
+  --ds-gray-300: light-dark(oklch(0.925 0 0), oklch(0.281 0 0));
+  --ds-gray-400: light-dark(oklch(0.937 0 0), oklch(0.301 0 0));
+  --ds-gray-500: light-dark(oklch(0.836 0 0), oklch(0.39 0 0));
+  --ds-gray-600: light-dark(oklch(0.732 0 0), oklch(0.623 0 0));
+  --ds-gray-700: light-dark(oklch(0.65 0 0), oklch(0.65 0 0));
+  --ds-gray-800: light-dark(oklch(0.59 0 0), oklch(0.59 0 0));
+  --ds-gray-900: light-dark(oklch(0.42 0 0), oklch(0.706 0 0));
+  --ds-gray-1000: light-dark(oklch(0.205 0 0), oklch(0.946 0 0));
+  --ds-blue-700: light-dark(oklch(57.61% 0.2508 258.23), oklch(57.61% 0.2321 258.23));
+
+  --background: var(--ds-background-200);
+  --foreground: var(--ds-gray-1000);
+  --border: var(--ds-gray-400);
+  --border-hover: var(--ds-gray-500);
+  --muted: var(--ds-gray-100);
+  --muted-foreground: var(--ds-gray-900);
+  --ring: var(--ds-blue-700);
+  --focus-gap: var(--ds-background-200);
+  --focus-ring: var(--ds-blue-700);
   --radius: 6px;
-  --sidebar: #fafafa;
-  --sidebar-foreground: #171717;
-  --sidebar-border: #eaeaea;
+  --sidebar: var(--ds-background-200);
+  --sidebar-foreground: var(--ds-gray-1000);
+  --sidebar-border: var(--ds-gray-400);
 
-  --panel-bg: #ffffff;
-  --panel-bg-strong: #ffffff;
-  --panel-border: #eaeaea;
+  --panel-bg: var(--ds-background-100);
+  --panel-bg-strong: var(--ds-background-100);
+  --panel-border: var(--ds-gray-400);
   --panel-shadow: none;
-  --panel-row-bg: #f2f2f2;
-  --panel-row-hover: #ebebeb;
-  --panel-row-active: #e6e6e6;
-  --panel-text-strong: #171717;
-  --panel-text-muted: #4d4d4d;
-  --panel-text-subtle: #8f8f8f;
-  --panel-handle: #171717;
+  --panel-row-bg: var(--ds-gray-100);
+  --panel-row-hover: var(--ds-gray-200);
+  --panel-row-active: var(--ds-gray-300);
+  --panel-text-strong: var(--ds-gray-1000);
+  --panel-text-muted: var(--ds-gray-900);
+  --panel-text-subtle: var(--ds-gray-700);
+  --panel-handle: var(--ds-gray-1000);
 
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --btn-solid: var(--ds-gray-1000);
+  --btn-solid-text: var(--ds-background-200);
+  --btn-solid-hover: var(--ds-gray-1000);
+
+  --ease-out: cubic-bezier(0.175, 0.885, 0.32, 1.1);
   --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  --checker-a: #efefef;
-  --checker-b: #ffffff;
+  --checker-a: var(--ds-gray-400);
+  --checker-b: var(--ds-background-200);
 }
 
 .dark {
-  --background: #000000;
-  --foreground: #ededed;
-  --border: #2e2e2e;
-  --border-hover: #454545;
-  --muted: #1a1a1a;
-  --muted-foreground: #a0a0a0;
-  --ring: #47a8ff;
-  --focus-gap: #000000;
-  --focus-ring: #47a8ff;
-  --sidebar: #000000;
-  --sidebar-foreground: #ededed;
-  --sidebar-border: #2e2e2e;
-
-  --panel-bg: #1a1a1a;
-  --panel-bg-strong: #1a1a1a;
-  --panel-border: #2e2e2e;
-  --panel-shadow: none;
-  --panel-row-bg: #1f1f1f;
-  --panel-row-hover: #292929;
-  --panel-row-active: #292929;
-  --panel-text-strong: #ededed;
-  --panel-text-muted: #a0a0a0;
-  --panel-text-subtle: #8f8f8f;
-  --panel-handle: #ededed;
-
-  --checker-a: #141414;
-  --checker-b: #1c1c1c;
+  color-scheme: dark;
 }
 
-.dialkit-root[data-theme="light"] {
-  --dial-surface: #f2f2f2;
-  --dial-surface-hover: #ebebeb;
-  --dial-surface-active: #e6e6e6;
-  --dial-surface-subtle: #eaeaea;
-  --dial-text-primary: #171717;
-  --dial-text-label: #4d4d4d;
-  --dial-text-secondary: #4d4d4d;
-  --dial-text-tertiary: #8f8f8f;
-  --dial-border: #eaeaea;
-  --dial-border-hover: #c9c9c9;
-  --dial-glass-bg: #ffffff;
-  --dial-dropdown-bg: #ffffff;
+.dialkit-root[data-theme="light"],
+.dialkit-root[data-theme="dark"],
+.dialkit-root[data-theme="system"] {
+  --dial-surface: var(--ds-gray-100);
+  --dial-surface-hover: var(--ds-gray-200);
+  --dial-surface-active: var(--ds-gray-300);
+  --dial-surface-subtle: var(--ds-gray-400);
+  --dial-text-primary: var(--ds-gray-1000);
+  --dial-text-label: var(--ds-gray-900);
+  --dial-text-secondary: var(--ds-gray-900);
+  --dial-text-tertiary: var(--ds-gray-700);
+  --dial-border: var(--ds-gray-400);
+  --dial-border-hover: var(--ds-gray-500);
+  --dial-glass-bg: var(--ds-background-100);
+  --dial-dropdown-bg: var(--ds-background-100);
   --dial-shadow: none;
   --dial-radius: 8px;
   --dial-row-height: 36px;
   font-family: var(--font-geist-sans), system-ui, sans-serif;
-}
-
-.dialkit-root[data-theme="dark"] {
-  --dial-surface: #1f1f1f;
-  --dial-surface-hover: #292929;
-  --dial-surface-active: #292929;
-  --dial-surface-subtle: #2e2e2e;
-  --dial-text-primary: #ededed;
-  --dial-text-label: #a0a0a0;
-  --dial-text-secondary: #a0a0a0;
-  --dial-text-tertiary: #8f8f8f;
-  --dial-border: #2e2e2e;
-  --dial-border-hover: #454545;
-  --dial-glass-bg: #1a1a1a;
-  --dial-dropdown-bg: #1a1a1a;
-  --dial-shadow: none;
-  --dial-radius: 8px;
-  --dial-row-height: 36px;
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
-}
-
-@media (prefers-color-scheme: light) {
-  .dialkit-root[data-theme="system"] {
-    --dial-surface: #f2f2f2;
-    --dial-surface-hover: #ebebeb;
-    --dial-surface-active: #e6e6e6;
-    --dial-surface-subtle: #eaeaea;
-    --dial-text-primary: #171717;
-    --dial-text-label: #4d4d4d;
-    --dial-text-secondary: #4d4d4d;
-    --dial-text-tertiary: #8f8f8f;
-    --dial-border: #eaeaea;
-    --dial-border-hover: #c9c9c9;
-    --dial-glass-bg: #ffffff;
-    --dial-dropdown-bg: #ffffff;
-    --dial-shadow: none;
-    --dial-radius: 8px;
-    --dial-row-height: 36px;
-    font-family: var(--font-geist-sans), system-ui, sans-serif;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .dialkit-root[data-theme="system"] {
-    --dial-surface: #1f1f1f;
-    --dial-surface-hover: #292929;
-    --dial-surface-active: #292929;
-    --dial-surface-subtle: #2e2e2e;
-    --dial-text-primary: #ededed;
-    --dial-text-label: #a0a0a0;
-    --dial-text-secondary: #a0a0a0;
-    --dial-text-tertiary: #8f8f8f;
-    --dial-border: #2e2e2e;
-    --dial-border-hover: #454545;
-    --dial-glass-bg: #1a1a1a;
-    --dial-dropdown-bg: #1a1a1a;
-    --dial-shadow: none;
-    --dial-radius: 8px;
-    --dial-row-height: 36px;
-    font-family: var(--font-geist-sans), system-ui, sans-serif;
-  }
 }
 
 @layer base {
@@ -205,7 +139,7 @@
     min-height: 36px;
     border-radius: 6px;
     background: var(--panel-row-bg);
-    transition: background-color 150ms var(--ease), transform 120ms var(--ease-out);
+    transition: background-color 150ms var(--ease), transform 150ms var(--ease-out);
   }
 
   .panel-row-value {
@@ -224,7 +158,7 @@
     transition:
       background-color 150ms var(--ease),
       color 150ms var(--ease),
-      transform 120ms var(--ease-out);
+      transform 150ms var(--ease-out);
   }
 
   .panel-action:active {
@@ -265,11 +199,15 @@
   }
 
   .btn-solid {
-    background: var(--foreground);
-    color: var(--background);
+    min-height: 36px;
+    border: 1px solid var(--btn-solid);
+    border-radius: 6px;
+    background: var(--btn-solid);
+    color: var(--btn-solid-text);
     transition:
       background-color 150ms var(--ease),
-      transform 120ms var(--ease-out),
+      border-color 150ms var(--ease),
+      transform 150ms var(--ease-out),
       opacity 150ms var(--ease);
   }
 
@@ -284,6 +222,7 @@
   }
 
   .btn-quiet {
+    min-height: 36px;
     border: 1px solid var(--border);
     background: var(--panel-row-bg);
     color: var(--panel-text-strong);
@@ -291,7 +230,7 @@
     transition:
       background-color 150ms var(--ease),
       border-color 150ms var(--ease),
-      transform 120ms var(--ease-out),
+      transform 150ms var(--ease-out),
       opacity 150ms var(--ease);
   }
 
@@ -327,14 +266,19 @@
 
   .credit-link {
     color: var(--panel-text-muted);
-    font-size: 12px;
-    line-height: 1.625;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
     transition: color 150ms var(--ease);
   }
 
   .icon-button {
+    min-height: 36px;
+    min-width: 36px;
+    border-radius: 6px;
     color: var(--foreground);
-    transition: color 150ms var(--ease), transform 120ms var(--ease-out);
+    transition: color 150ms var(--ease), background-color 150ms var(--ease),
+      transform 150ms var(--ease-out);
   }
 
   .icon-button:active {
@@ -342,7 +286,7 @@
   }
 
   .remove-photo {
-    transition: background-color 150ms var(--ease), transform 120ms var(--ease-out);
+    transition: background-color 150ms var(--ease), transform 150ms var(--ease-out);
   }
 }
 
@@ -381,11 +325,8 @@
   }
 
   .btn-solid:hover:not(:disabled) {
-    background: #000000;
-  }
-
-  .dark .btn-solid:hover:not(:disabled) {
-    background: #ffffff;
+    background: var(--btn-solid-hover);
+    border-color: var(--btn-solid-hover);
   }
 
   .btn-quiet:hover:not(:disabled) {
