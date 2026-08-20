@@ -45,3 +45,5 @@ export const MAX_ZOOM = 5;
 export const EXPORT_MAX_WIDTH = 900;
 /** Shared canvas height for 2, 3, and 4 panels (classic 2-up / ~16:9). */
 export const EXPORT_HEIGHT = 506;
+/** Encoded PNG must stay strictly below 5 MB. */
+export const EXPORT_MAX_BYTES = 5 * 1024 * 1024 - 1;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { flushSync } from "react-dom";
 import { exportTychPng } from "@/lib/export";
 import { IMAGE_ACCEPT } from "@/lib/images";
 import { LisseButton } from "./lisse-button";
@@ -26,12 +27,14 @@ export function AppToolbar() {
 
   async function onSave() {
     if (!ready || exporting) return;
-    setError(null);
-    setExporting(true);
+    flushSync(() => {
+      setError(null);
+      setExporting(true);
+    });
     try {
-      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
       await exportTychPng({ count, gap, slots, crops });
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return;
       setError(err instanceof Error ? err.message : "Could not save the PNG.");
     } finally {
       setExporting(false);

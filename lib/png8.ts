@@ -1,3 +1,5 @@
+import type { Rect } from "./types";
+
 const CRC_TABLE = (() => {
   const table = new Uint32Array(256);
   for (let n = 0; n < 256; n++) {
@@ -90,23 +92,28 @@ type Box = {
   count: number;
 };
 
-function unpack15(c: number): [number, number, number] {
-  return [c >> 10, (c >> 5) & 31, c & 31];
+/** 6 bits/channel — finer than 5-bit bins, still a compact histogram. */
+function pack18(r: number, g: number, b: number): number {
+  return ((r >> 2) << 12) | ((g >> 2) << 6) | (b >> 2);
 }
 
-function expand5(n: number): number {
-  return (n << 3) | (n >> 2);
+function unpack18(c: number): [number, number, number] {
+  return [c >> 12, (c >> 6) & 63, c & 63];
+}
+
+function expand6(n: number): number {
+  return (n << 2) | (n >> 4);
 }
 
 function longestChannel(colors: number[]): 0 | 1 | 2 {
-  let rmin = 31;
+  let rmin = 63;
   let rmax = 0;
-  let gmin = 31;
+  let gmin = 63;
   let gmax = 0;
-  let bmin = 31;
+  let bmin = 63;
   let bmax = 0;
   for (const c of colors) {
-    const [r, g, b] = unpack15(c);
+    const [r, g, b] = unpack18(c);
     if (r < rmin) rmin = r;
     if (r > rmax) rmax = r;
     if (g < gmin) gmin = g;
@@ -122,20 +129,31 @@ function longestChannel(colors: number[]): 0 | 1 | 2 {
   return 2;
 }
 
+function boxRange(colors: number[]): number {
+  let rmin = 63;
+  let rmax = 0;
+  let gmin = 63;
+  let gmax = 0;
+  let bmin = 63;
+  let bmax = 0;
+  for (const c of colors) {
+    const [r, g, b] = unpack18(c);
+    if (r < rmin) rmin = r;
+    if (r > rmax) rmax = r;
+    if (g < gmin) gmin = g;
+    if (g > gmax) gmax = g;
+    if (b < bmin) bmin = b;
+    if (b > bmax) bmax = b;
+  }
+  return (rmax - rmin) * (gmax - gmin) * (bmax - bmin);
+}
+
 function splitBox(box: Box, hist: Uint32Array): [Box, Box] {
   const ch = longestChannel(box.colors);
-  const sorted = [...box.colors].sort((a, b) => unpack15(a)[ch] - unpack15(b)[ch]);
-  const half = box.count / 2;
-  let acc = 0;
-  let cut = 0;
-  for (let i = 0; i < sorted.length - 1; i++) {
-    acc += hist[sorted[i]];
-    if (acc >= half) {
-      cut = i + 1;
-      break;
-    }
-  }
-  if (cut === 0) cut = Math.max(1, Math.floor(sorted.length / 2));
+  const sorted = box.colors.slice().sort((a, b) => unpack18(a)[ch] - unpack18(b)[ch]);
+  // Split unique colors, not population. Population cuts bury ramps
+  // (few pixels per hue) under dense clumps of similar greens/grays.
+  const cut = Math.max(1, Math.min(sorted.length - 1, Math.floor(sorted.length / 2)));
 
   const leftColors = sorted.slice(0, cut);
   const rightColors = sorted.slice(cut);
@@ -157,30 +175,17 @@ function boxAverage(box: Box, hist: Uint32Array): [number, number, number] {
   let n = 0;
   for (const c of box.colors) {
     const w = hist[c];
-    const [rr, gg, bb] = unpack15(c);
-    r += expand5(rr) * w;
-    g += expand5(gg) * w;
-    b += expand5(bb) * w;
+    const [rr, gg, bb] = unpack18(c);
+    r += expand6(rr) * w;
+    g += expand6(gg) * w;
+    b += expand6(bb) * w;
     n += w;
   }
   if (n === 0) return [0, 0, 0];
   return [Math.round(r / n), Math.round(g / n), Math.round(b / n)];
 }
 
-/**
- * Median-cut palette for opaque pixels. Index 0 is reserved for transparency.
- */
-function quantizeOpaque(
-  data: Uint8ClampedArray,
-  maxColors: number,
-): { palette: Uint8Array; map: Uint8Array } {
-  const hist = new Uint32Array(32768);
-  for (let i = 0; i < data.length; i += 4) {
-    if (data[i + 3] < 128) continue;
-    const idx = ((data[i] >> 3) << 10) | ((data[i + 1] >> 3) << 5) | (data[i + 2] >> 3);
-    hist[idx]++;
-  }
-
+function uniqueFromHist(hist: Uint32Array): { used: number[]; total: number } {
   const used: number[] = [];
   let total = 0;
   for (let i = 0; i < hist.length; i++) {
@@ -189,10 +194,44 @@ function quantizeOpaque(
       total += hist[i];
     }
   }
+  return { used, total };
+}
 
-  if (used.length === 0) {
-    return { palette: new Uint8Array(3), map: new Uint8Array(32768) };
+function histogramRegion(
+  data: Uint8ClampedArray,
+  width: number,
+  region: { x: number; y: number; w: number; h: number },
+): { hist: Uint32Array; score: number } {
+  const hist = new Uint32Array(262144);
+  let chroma = 0;
+  let pixels = 0;
+  let unique = 0;
+  const x1 = region.x + region.w;
+  const y1 = region.y + region.h;
+  for (let y = region.y; y < y1; y++) {
+    for (let x = region.x; x < x1; x++) {
+      const i = (y * width + x) * 4;
+      if (data[i + 3] < 128) continue;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      pixels++;
+      chroma += Math.max(r, g, b) - Math.min(r, g, b);
+      const key = pack18(r, g, b);
+      if (hist[key] === 0) unique++;
+      hist[key]++;
+    }
   }
+  const avgChroma = pixels === 0 ? 0 : chroma / pixels;
+  return { hist, score: Math.max(1, unique * (1 + avgChroma / 24)) };
+}
+
+/**
+ * Median-cut palette for opaque pixels. Index 0 is reserved for transparency.
+ */
+function paletteFromHist(hist: Uint32Array, maxColors: number): Uint8Array {
+  const { used, total } = uniqueFromHist(hist);
+  if (used.length === 0) return new Uint8Array(0);
 
   const colorBudget = Math.min(maxColors, used.length);
   const boxes: Box[] = [{ colors: used, count: total }];
@@ -202,7 +241,7 @@ function quantizeOpaque(
     let bestScore = -1;
     for (let i = 0; i < boxes.length; i++) {
       if (boxes[i].colors.length < 2) continue;
-      const score = boxes[i].count;
+      const score = 1 + boxRange(boxes[i].colors);
       if (score > bestScore) {
         bestScore = score;
         best = i;
@@ -215,37 +254,173 @@ function quantizeOpaque(
   }
 
   const palette = new Uint8Array(boxes.length * 3);
-  const map = new Uint8Array(32768);
   boxes.forEach((box, i) => {
     const [r, g, b] = boxAverage(box, hist);
     palette[i * 3] = r;
     palette[i * 3 + 1] = g;
     palette[i * 3 + 2] = b;
-    const index = i + 1; // 0 reserved for transparency
-    for (const c of box.colors) map[c] = index;
   });
+  return palette;
+}
 
-  return { palette, map };
+function allocateBudgets(scores: number[], total: number): number[] {
+  const sum = scores.reduce((a, b) => a + b, 0);
+  const ks = scores.map((s) => Math.max(8, Math.floor((total * s) / sum)));
+  let diff = total - ks.reduce((a, b) => a + b, 0);
+  const order = scores.map((_, i) => i).sort((a, b) => scores[b] - scores[a]);
+  let o = 0;
+  while (diff > 0) {
+    ks[order[o % order.length]]++;
+    diff--;
+    o++;
+  }
+  while (diff < 0) {
+    const i = order.find((idx) => ks[idx] > 8);
+    if (i === undefined) break;
+    ks[i]--;
+    diff++;
+  }
+  return ks;
+}
+
+function concatPalettes(parts: Uint8Array[]): Uint8Array {
+  const seen = new Set<number>();
+  const rgb: number[] = [];
+  const add = (r: number, g: number, b: number) => {
+    if (rgb.length >= 255 * 3) return;
+    const key = (r << 16) | (g << 8) | b;
+    if (seen.has(key)) return;
+    seen.add(key);
+    rgb.push(r, g, b);
+  };
+  // Round-robin so a late panel (e.g. the rainbow) is not truncated.
+  let round = 0;
+  let added = true;
+  while (added && rgb.length < 255 * 3) {
+    added = false;
+    for (const part of parts) {
+      const i = round * 3;
+      if (i + 2 >= part.length) continue;
+      add(part[i], part[i + 1], part[i + 2]);
+      added = true;
+      if (rgb.length >= 255 * 3) break;
+    }
+    round++;
+  }
+  return new Uint8Array(rgb);
+}
+
+function nearestPaletteIndex(r: number, g: number, b: number, palette: Uint8Array): number {
+  let best = 0;
+  let bestD = Infinity;
+  const n = palette.length / 3;
+  for (let i = 0; i < n; i++) {
+    const dr = r - palette[i * 3];
+    const dg = g - palette[i * 3 + 1];
+    const db = b - palette[i * 3 + 2];
+    const d = 2 * dr * dr + 4 * dg * dg + 3 * db * db;
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  return best + 1;
+}
+
+function buildColorLut(palette: Uint8Array): Uint8Array {
+  const lut = new Uint8Array(32768);
+  for (let r = 0; r < 32; r++) {
+    const r8 = (r << 3) | (r >> 2);
+    for (let g = 0; g < 32; g++) {
+      const g8 = (g << 3) | (g >> 2);
+      for (let b = 0; b < 32; b++) {
+        lut[(r << 10) | (g << 5) | b] = nearestPaletteIndex(
+          r8,
+          g8,
+          (b << 3) | (b >> 2),
+          palette,
+        );
+      }
+    }
+  }
+  return lut;
+}
+
+function clampByte(n: number): number {
+  return n < 0 ? 0 : n > 255 ? 255 : n;
 }
 
 function buildIndexed(
   imageData: ImageData,
+  panels?: Rect[],
 ): { indices: Uint8Array; plte: Uint8Array } {
   const { width, height, data } = imageData;
-  const { palette, map } = quantizeOpaque(data, 255);
-  const indices = new Uint8Array(width * height);
+  const regions =
+    panels && panels.length > 0
+      ? panels
+      : [{ x: 0, y: 0, w: width, h: height }];
 
-  for (let i = 0, p = 0; i < data.length; i += 4, p++) {
-    if (data[i + 3] < 128) {
-      indices[p] = 0;
-      continue;
+  const analyses = regions.map((region) => histogramRegion(data, width, region));
+  const budgets = allocateBudgets(
+    analyses.map((a) => a.score),
+    255,
+  );
+  const localPalettes = analyses.map((a, i) => paletteFromHist(a.hist, budgets[i]));
+  let palette = concatPalettes(localPalettes.filter((p) => p.length > 0));
+  if (palette.length === 0) palette = new Uint8Array(3);
+  const lut = buildColorLut(palette);
+
+  const indices = new Uint8Array(width * height);
+  const cur = new Float32Array(width * 3);
+  const nxt = new Float32Array(width * 3);
+
+  const addErr = (
+    buf: Float32Array,
+    x: number,
+    y: number,
+    w: number,
+    er: number,
+    eg: number,
+    eb: number,
+  ) => {
+    if (x < 0 || x >= width || y >= height) return;
+    if (data[(y * width + x) * 4 + 3] < 128) return;
+    const o = x * 3;
+    buf[o] += er * w;
+    buf[o + 1] += eg * w;
+    buf[o + 2] += eb * w;
+  };
+
+  for (let y = 0; y < height; y++) {
+    const ltr = y % 2 === 0;
+    nxt.fill(0);
+    for (let xi = 0; xi < width; xi++) {
+      const x = ltr ? xi : width - 1 - xi;
+      const p = y * width + x;
+      const i = p * 4;
+      if (data[i + 3] < 128) {
+        indices[p] = 0;
+        continue;
+      }
+      const o = x * 3;
+      const r = clampByte(data[i] + cur[o]);
+      const g = clampByte(data[i + 1] + cur[o + 1]);
+      const b = clampByte(data[i + 2] + cur[o + 2]);
+      const idx = lut[((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3)];
+      indices[p] = idx;
+      const er = r - palette[(idx - 1) * 3];
+      const eg = g - palette[(idx - 1) * 3 + 1];
+      const eb = b - palette[(idx - 1) * 3 + 2];
+      const dx = ltr ? 1 : -1;
+      addErr(cur, x + dx, y, 7 / 16, er, eg, eb);
+      addErr(nxt, x - dx, y + 1, 3 / 16, er, eg, eb);
+      addErr(nxt, x, y + 1, 5 / 16, er, eg, eb);
+      addErr(nxt, x + dx, y + 1, 1 / 16, er, eg, eb);
     }
-    const idx = ((data[i] >> 3) << 10) | ((data[i + 1] >> 3) << 5) | (data[i + 2] >> 3);
-    indices[p] = map[idx] || 1;
+    cur.set(nxt);
   }
 
   const plte = new Uint8Array(3 + palette.length);
-  // index 0: unused RGB (fully transparent via tRNS)
   plte.set(palette, 3);
   return { indices, plte };
 }
@@ -265,9 +440,12 @@ function filteredScanlines(indices: Uint8Array, width: number, height: number): 
  * 8-bit indexed PNG with a fully transparent index 0.
  * Opaque panel pixels are quantized to ≤255 colors. Gutters stay alpha = 0.
  */
-export async function encodePng8(imageData: ImageData): Promise<Blob> {
+export async function encodePng8(
+  imageData: ImageData,
+  panels?: Rect[],
+): Promise<Blob> {
   const { width, height } = imageData;
-  const { indices, plte } = buildIndexed(imageData);
+  const { indices, plte } = buildIndexed(imageData, panels);
   const idat = await zlibDeflate(filteredScanlines(indices, width, height));
 
   const ihdr = new Uint8Array(13);

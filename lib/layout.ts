@@ -59,6 +59,23 @@ export function getTychLayout(count: PanelCount, gap: GapPx): TychLayout {
   return layout;
 }
 
+/** Integer scale for offscreen supersampling. Output is still quantized at 900px. */
+export function scaleTychLayout(layout: TychLayout, factor: number): TychLayout {
+  if (factor === 1) return layout;
+  return {
+    count: layout.count,
+    gap: (layout.gap * factor) as GapPx,
+    width: layout.width * factor,
+    height: layout.height * factor,
+    panels: layout.panels.map((panel) => ({
+      x: panel.x * factor,
+      y: panel.y * factor,
+      w: panel.w * factor,
+      h: panel.h * factor,
+    })),
+  };
+}
+
 export function assertCleanLayout(layout: TychLayout): void {
   const { width, height, gap, panels, count } = layout;
   const [left, right] = splitWithGap(width, gap);

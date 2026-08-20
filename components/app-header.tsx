@@ -9,8 +9,8 @@ export function AppHeader() {
         <h1 className="text-[32px] font-semibold leading-none tracking-tight text-foreground">
           Tych
         </h1>
-        <p className="panel-copy mt-3 max-w-[22rem]">
-          Make your own multi-image grid.
+        <p className="panel-copy mt-1.5 max-w-[22rem] text-[15px] leading-snug">
+          Make image grids for X(Twitter) posts.
         </p>
       </div>
       <ThemeToggle />
