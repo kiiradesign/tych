@@ -479,24 +479,24 @@ function isAppleTouchDevice() {
   );
 }
 
-function isMobileSave() {
-  return (
-    /Android/i.test(navigator.userAgent) || isAppleTouchDevice()
-  );
+function isAndroid() {
+  return /Android/i.test(navigator.userAgent);
 }
 
-async function shareImageFile(
-  blob: Blob,
-  filename: string,
-  type: string,
-): Promise<"shared" | "cancelled" | "unavailable"> {
+function pngFile(blob: Blob, filename: string): File {
+  const name = filename.toLowerCase().endsWith(".png") ? filename : `${filename}.png`;
+  return new File([blob], name, { type: "image/png", lastModified: Date.now() });
+}
+
+async function sharePngFile(file: File): Promise<"shared" | "cancelled" | "unavailable"> {
   if (typeof navigator.share !== "function") return "unavailable";
-  const file = new File([blob], filename, { type });
-  if (typeof navigator.canShare === "function" && !navigator.canShare({ files: [file] })) {
-    return "unavailable";
-  }
+  // Files only. Extra title/text/url hides “Save Image” on iOS and Gallery on some Androids.
+  const payload = { files: [file] };
   try {
-    await navigator.share({ files: [file] });
+    if (typeof navigator.canShare === "function" && !isAppleTouchDevice()) {
+      if (!navigator.canShare(payload)) return "unavailable";
+    }
+    await navigator.share(payload);
     return "shared";
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") return "cancelled";
@@ -510,23 +510,40 @@ function openBlobTab(blob: Blob) {
   window.setTimeout(() => URL.revokeObjectURL(url), 120_000);
 }
 
-export async function downloadBlob(blob: Blob, filename: string) {
-  if (isMobileSave()) {
-    const result = await shareImageFile(blob, filename, blob.type || "image/png");
-    if (result === "shared" || result === "cancelled") return;
-    if (isAppleTouchDevice()) {
-      openBlobTab(blob);
-      return;
-    }
-  }
-
-  const url = URL.createObjectURL(blob);
+/** Writes the PNG-8 blob with the browser download UI (Downloads, not Camera Roll). */
+function savePngToDevice(file: File) {
+  const url = URL.createObjectURL(file);
   const a = document.createElement("a");
   a.href = url;
-  a.download = filename;
+  a.download = file.name;
   a.rel = "noopener";
+  a.type = "image/png";
   document.body.appendChild(a);
   a.click();
   a.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+/**
+ * A website cannot write into Camera Roll / Gallery. Apple and Google only
+ * allow that from native apps with Photos / MediaStore permission.
+ * Mobile: share the PNG-8 so the sheet can include Save Image / Photos.
+ * Desktop: Downloads folder.
+ */
+export async function downloadBlob(blob: Blob, filename: string) {
+  const file = pngFile(blob, filename);
+
+  if (isAppleTouchDevice() || isAndroid()) {
+    const result = await sharePngFile(file);
+    if (result === "shared") return;
+    if (isAndroid()) {
+      savePngToDevice(file);
+      return;
+    }
+    if (result === "cancelled") return;
+    openBlobTab(file);
+    return;
+  }
+
+  savePngToDevice(file);
 }
