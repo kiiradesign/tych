@@ -1,7 +1,5 @@
 "use client";
 
-import { ThemeToggle } from "./theme-toggle";
-
 export function AppHeader() {
   return (
     <header className="flex items-start justify-between gap-4">
@@ -13,7 +11,6 @@ export function AppHeader() {
           Make image grids for X(Twitter) posts.
         </p>
       </div>
-      <ThemeToggle />
     </header>
   );
 }

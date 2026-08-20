@@ -72,7 +72,7 @@ export function CanvasStage() {
             borderRadius: 24,
           }}
         >
-          <div className="pointer-events-none absolute inset-0 bg-[var(--ds-background-200)]" aria-hidden />
+          <div className="pointer-events-none absolute inset-0 bg-black" aria-hidden />
           {cssPerPanelPx > 0
             ? layout.panels.map((panel, index) => (
                 <PanelCropper

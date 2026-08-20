@@ -11,7 +11,7 @@ export type Rect = {
 
 export type TychLayout = {
   count: PanelCount;
-  gap: GapPx;
+  gap: number;
   width: number;
   height: number;
   panels: Rect[];
@@ -42,8 +42,10 @@ export const DEFAULT_CROP: CropState = {
 };
 
 export const MAX_ZOOM = 5;
-export const EXPORT_MAX_WIDTH = 900;
-/** Shared canvas height for 2, 3, and 4 panels (classic 2-up / ~16:9). */
-export const EXPORT_HEIGHT = 506;
+/** Preview canvas — export is sized from the source photos. */
+export const PREVIEW_WIDTH = 900;
+export const PREVIEW_HEIGHT = 506;
+/** Longer export edge. Browser canvas limits; we shrink further to stay under 5 MB. */
+export const EXPORT_MAX_EDGE = 4096;
 /** Encoded PNG must stay strictly below 5 MB. */
 export const EXPORT_MAX_BYTES = 5 * 1024 * 1024 - 1;

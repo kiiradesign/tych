@@ -46,14 +46,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/tych-favicon-darkmode.svg",
-        type: "image/svg+xml",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
         url: "/tych-favicon-lightmode.svg",
         type: "image/svg+xml",
-        media: "(prefers-color-scheme: dark)",
       },
     ],
   },
@@ -65,7 +59,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <link rel="preload" as="image" href="/placeholders/1.jpg" type="image/jpeg" />
         <link rel="preload" as="image" href="/placeholders/2.jpg" type="image/jpeg" />

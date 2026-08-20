@@ -1,5 +1,5 @@
 import type { GapPx, PanelCount, Rect, TychLayout } from "./types";
-import { EXPORT_HEIGHT, EXPORT_MAX_WIDTH } from "./types";
+import { PREVIEW_HEIGHT, PREVIEW_WIDTH } from "./types";
 
 /**
  * Integer split of `total` into two parts separated by `gap`.
@@ -21,12 +21,12 @@ export function panelCountFor(imageCount: number): PanelCount {
   return n as PanelCount;
 }
 
-export function canvasSizeFor(_count: PanelCount): { width: number; height: number } {
-  return { width: EXPORT_MAX_WIDTH, height: EXPORT_HEIGHT };
-}
-
-export function getTychLayout(count: PanelCount, gap: GapPx): TychLayout {
-  const { width, height } = canvasSizeFor(count);
+export function getTychLayout(
+  count: PanelCount,
+  gap: number,
+  width = PREVIEW_WIDTH,
+  height = PREVIEW_HEIGHT,
+): TychLayout {
   const [left, right] = splitWithGap(width, gap);
   const rightX = left + gap;
 
@@ -59,21 +59,16 @@ export function getTychLayout(count: PanelCount, gap: GapPx): TychLayout {
   return layout;
 }
 
-/** Integer scale for offscreen supersampling. Output is still quantized at 900px. */
-export function scaleTychLayout(layout: TychLayout, factor: number): TychLayout {
-  if (factor === 1) return layout;
-  return {
-    count: layout.count,
-    gap: (layout.gap * factor) as GapPx,
-    width: layout.width * factor,
-    height: layout.height * factor,
-    panels: layout.panels.map((panel) => ({
-      x: panel.x * factor,
-      y: panel.y * factor,
-      w: panel.w * factor,
-      h: panel.h * factor,
-    })),
-  };
+/** Same proportions as the 900×506 preview, scaled to `width`. */
+export function layoutAtWidth(
+  count: PanelCount,
+  previewGap: GapPx,
+  width: number,
+): TychLayout {
+  const w = Math.max(1, Math.round(width));
+  const height = Math.max(1, Math.round((w * PREVIEW_HEIGHT) / PREVIEW_WIDTH));
+  const gap = Math.max(1, Math.round((previewGap * w) / PREVIEW_WIDTH));
+  return getTychLayout(count, gap, w, height);
 }
 
 export function assertCleanLayout(layout: TychLayout): void {

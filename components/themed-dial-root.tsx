@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { DialRoot } from "dialkit";
-import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function ThemedDialRoot() {
-  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -13,6 +11,5 @@ export function ThemedDialRoot() {
   }, []);
 
   if (!mounted) return null;
-
-  return <DialRoot theme={resolvedTheme === "dark" ? "dark" : "light"} />;
+  return <DialRoot theme="dark" />;
 }

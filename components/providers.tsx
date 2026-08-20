@@ -1,17 +1,7 @@
 "use client";
 
-import { ThemeProvider } from "next-themes";
+import type { ReactNode } from "react";
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      storageKey="tych-theme"
-      disableTransitionOnChange
-    >
-      {children}
-    </ThemeProvider>
-  );
+export function Providers({ children }: { children: ReactNode }) {
+  return children;
 }

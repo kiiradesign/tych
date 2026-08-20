@@ -7,11 +7,12 @@ export function createExportCanvas(
   const canvas = document.createElement("canvas");
   canvas.width = layout.width;
   canvas.height = layout.height;
-  const ctx = canvas.getContext("2d", { alpha: true, willReadFrequently: true });
+  const ctx = canvas.getContext("2d", { alpha: false, willReadFrequently: true });
   if (!ctx) {
     throw new Error("Canvas is unavailable in this browser.");
   }
-  ctx.clearRect(0, 0, layout.width, layout.height);
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0, 0, layout.width, layout.height);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   return { canvas, ctx };
@@ -27,9 +28,10 @@ export function compositeTych(
     ? (() => {
         target.width = layout.width;
         target.height = layout.height;
-        const ctx = target.getContext("2d", { alpha: true, willReadFrequently: true });
+        const ctx = target.getContext("2d", { alpha: false, willReadFrequently: true });
         if (!ctx) throw new Error("Canvas is unavailable in this browser.");
-        ctx.clearRect(0, 0, layout.width, layout.height);
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, layout.width, layout.height);
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = "high";
         return { canvas: target, ctx };
