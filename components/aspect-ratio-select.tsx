@@ -69,7 +69,7 @@ export function AspectRatioSelect({
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "ratio-select geist-focus-visible flex items-center px-2.5 text-[13px]",
+          "ratio-select geist-focus-visible flex items-center px-3 text-[14px]",
           spread ? "w-full justify-between gap-3" : "gap-1.5",
           disabled && "opacity-50",
         )}

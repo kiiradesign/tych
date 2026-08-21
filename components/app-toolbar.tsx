@@ -6,7 +6,6 @@ import { flushSync } from "react-dom";
 import { exportTychPng } from "@/lib/export";
 import { IMAGE_ACCEPT } from "@/lib/images";
 import { AspectRatioSelect } from "./aspect-ratio-select";
-import { LisseButton } from "./lisse-button";
 import { useTych } from "./tych-store";
 
 export function AppToolbar() {
@@ -90,12 +89,11 @@ export function AppToolbar() {
               else void addFiles(files);
             }}
           />
-          <LisseButton
-            radius={6}
+          <button
+            type="button"
             disabled={!ready || exporting}
             onClick={() => void onSave()}
-            wrapClassName="min-w-0 flex-1 sm:flex-none"
-            className="btn-solid inline-flex w-full items-center justify-center gap-1.5 px-3 text-[14px] font-medium sm:w-auto"
+            className="btn-solid geist-focus-visible inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 px-3 text-[14px] font-medium sm:flex-none sm:shrink-0"
           >
             {exporting ? (
               "Saving…"
@@ -105,7 +103,7 @@ export function AppToolbar() {
                 Save
               </>
             )}
-          </LisseButton>
+          </button>
         </div>
       </div>
       {error ? (
