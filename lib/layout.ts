@@ -1,5 +1,6 @@
-import type { GapPx, PanelCount, Rect, TychLayout } from "./types";
-import { PREVIEW_HEIGHT, PREVIEW_WIDTH } from "./types";
+import type { AspectRatioId, GapPx, PanelCount, Rect, TychLayout } from "./types";
+import { PREVIEW_WIDTH } from "./types";
+import { previewHeightForAspect } from "./aspect-ratio";
 
 /**
  * Integer split of `total` into two parts separated by `gap`.
@@ -24,8 +25,10 @@ export function getTychLayout(
   count: PanelCount,
   gap: number,
   width = PREVIEW_WIDTH,
-  height = PREVIEW_HEIGHT,
+  height?: number,
+  aspectRatio?: AspectRatioId,
 ): TychLayout {
+  const h = height ?? previewHeightForAspect(aspectRatio ?? "1:1", width);
   const [left, right] = splitWithGap(width, gap);
   const rightX = left + gap;
 
@@ -33,18 +36,18 @@ export function getTychLayout(
 
   if (count === 2) {
     panels = [
-      { x: 0, y: 0, w: left, h: height },
-      { x: rightX, y: 0, w: right, h: height },
+      { x: 0, y: 0, w: left, h: h },
+      { x: rightX, y: 0, w: right, h: h },
     ];
   } else if (count === 3) {
-    const [top, bottom] = splitWithGap(height, gap);
+    const [top, bottom] = splitWithGap(h, gap);
     panels = [
-      { x: 0, y: 0, w: left, h: height },
+      { x: 0, y: 0, w: left, h: h },
       { x: rightX, y: 0, w: right, h: top },
       { x: rightX, y: top + gap, w: right, h: bottom },
     ];
   } else {
-    const [top, bottom] = splitWithGap(height, gap);
+    const [top, bottom] = splitWithGap(h, gap);
     panels = [
       { x: 0, y: 0, w: left, h: top },
       { x: rightX, y: 0, w: right, h: top },
@@ -53,19 +56,20 @@ export function getTychLayout(
     ];
   }
 
-  const layout = { count, gap, width, height, panels };
+  const layout = { count, gap, width, height: h, panels };
   assertCleanLayout(layout);
   return layout;
 }
 
-/** Same proportions as the 900×506 preview, scaled to `width`. */
+/** Same grid proportions scaled to `width`, keeping the chosen aspect ratio. */
 export function layoutAtWidth(
   count: PanelCount,
   previewGap: GapPx,
   width: number,
+  aspectRatio: AspectRatioId,
 ): TychLayout {
   const w = Math.max(1, Math.round(width));
-  const height = Math.max(1, Math.round((w * PREVIEW_HEIGHT) / PREVIEW_WIDTH));
+  const height = previewHeightForAspect(aspectRatio, w);
   const gap = Math.max(1, Math.round((previewGap * w) / PREVIEW_WIDTH));
   return getTychLayout(count, gap, w, height);
 }

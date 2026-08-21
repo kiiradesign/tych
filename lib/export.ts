@@ -6,6 +6,7 @@ import {
   EXPORT_MAX_BYTES,
   EXPORT_MAX_EDGE,
   PREVIEW_WIDTH,
+  type AspectRatioId,
   type CropState,
   type GapPx,
   type PanelCount,
@@ -38,10 +39,11 @@ function downsample(source: HTMLCanvasElement, width: number): HTMLCanvasElement
 function idealExportWidth(
   count: PanelCount,
   gap: GapPx,
+  aspectRatio: AspectRatioId,
   slots: Array<SlotImage | null>,
   crops: CropState[],
 ): number {
-  const preview = getTychLayout(count, gap);
+  const preview = getTychLayout(count, gap, PREVIEW_WIDTH, undefined, aspectRatio);
   let scale = 1;
   preview.panels.forEach((panel, i) => {
     const image = slots[i];
@@ -49,8 +51,12 @@ function idealExportWidth(
     const src = getSourceRect(image.width, image.height, panel, crops[i]);
     scale = Math.max(scale, src.sw / panel.w, src.sh / panel.h);
   });
-  const width = Math.round(preview.width * scale);
-  return Math.min(EXPORT_MAX_EDGE, Math.max(PREVIEW_WIDTH, width));
+  let width = Math.round(preview.width * scale);
+  const longEdge = Math.max(width, Math.round(preview.height * scale));
+  if (longEdge > EXPORT_MAX_EDGE) {
+    width = Math.max(PREVIEW_WIDTH, Math.floor(width * (EXPORT_MAX_EDGE / longEdge)));
+  }
+  return Math.max(PREVIEW_WIDTH, width);
 }
 
 async function encodePngUnderLimit(source: HTMLCanvasElement): Promise<Blob> {
@@ -75,12 +81,13 @@ async function encodePngUnderLimit(source: HTMLCanvasElement): Promise<Blob> {
 export async function exportTychPng(options: {
   count: PanelCount;
   gap: GapPx;
+  aspectRatio: AspectRatioId;
   slots: Array<SlotImage | null>;
   crops: CropState[];
 }): Promise<void> {
-  const { count, gap, slots, crops } = options;
-  const width = idealExportWidth(count, gap, slots, crops);
-  const layout = layoutAtWidth(count, gap, width);
+  const { count, gap, aspectRatio, slots, crops } = options;
+  const width = idealExportWidth(count, gap, aspectRatio, slots, crops);
+  const layout = layoutAtWidth(count, gap, width, aspectRatio);
   const canvas = compositeTych(layout, slots, crops);
   const blob = await encodePngUnderLimit(canvas);
   await downloadBlob(blob, `Tych-${count}.png`);

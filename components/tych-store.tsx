@@ -15,6 +15,9 @@ import { disposeSlot, loadSlotImage } from "@/lib/images";
 import { loadPlaceholderSlot, PLACEHOLDER_PATHS } from "@/lib/placeholders";
 import {
   DEFAULT_CROP,
+  DEFAULT_ASPECT_RATIO,
+  PREVIEW_WIDTH,
+  type AspectRatioId,
   type CropState,
   type GapPx,
   type PanelCount,
@@ -25,6 +28,7 @@ import {
 type TychContextValue = {
   count: PanelCount;
   gap: GapPx;
+  aspectRatio: AspectRatioId;
   slots: Array<SlotImage | null>;
   crops: CropState[];
   selected: number;
@@ -33,6 +37,7 @@ type TychContextValue = {
   error: string | null;
   setCount: (count: PanelCount) => void;
   setGap: (gap: GapPx) => void;
+  setAspectRatio: (ratio: AspectRatioId) => void;
   setSelected: (index: number) => void;
   setPreviewGround: (ground: PreviewGround) => void;
   setCrop: (index: number, crop: CropState) => void;
@@ -71,6 +76,7 @@ function swapIndex<T>(items: T[], from: number, to: number): T[] {
 export function TychProvider({ children }: { children: ReactNode }) {
   const [count, setCountState] = useState<PanelCount>(4);
   const [gap, setGap] = useState<GapPx>(4);
+  const [aspectRatio, setAspectRatio] = useState<AspectRatioId>(DEFAULT_ASPECT_RATIO);
   const [slots, setSlots] = useState<Array<SlotImage | null>>(() => emptySlots(4));
   const [crops, setCrops] = useState<CropState[]>(() => emptyCrops(4));
   const [selected, setSelected] = useState(0);
@@ -301,6 +307,7 @@ export function TychProvider({ children }: { children: ReactNode }) {
     () => ({
       count,
       gap,
+      aspectRatio,
       slots,
       crops,
       selected,
@@ -309,6 +316,7 @@ export function TychProvider({ children }: { children: ReactNode }) {
       error,
       setCount,
       setGap,
+      setAspectRatio,
       setSelected,
       setPreviewGround,
       setCrop,
@@ -327,6 +335,7 @@ export function TychProvider({ children }: { children: ReactNode }) {
       clearSlot,
       moveSlot,
       count,
+      aspectRatio,
       crops,
       error,
       exporting,
@@ -351,6 +360,6 @@ export function useTych() {
 }
 
 export function useTychLayout() {
-  const { count, gap } = useTych();
-  return getTychLayout(count, gap);
+  const { count, gap, aspectRatio } = useTych();
+  return getTychLayout(count, gap, PREVIEW_WIDTH, undefined, aspectRatio);
 }

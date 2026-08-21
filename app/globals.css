@@ -300,6 +300,56 @@
     isolation: isolate;
   }
 
+  .ratio-select {
+    min-height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel-row-bg);
+    color: var(--panel-text-strong);
+    transition:
+      background-color 150ms var(--ease),
+      border-color 150ms var(--ease),
+      transform 150ms var(--ease-out);
+  }
+
+  .ratio-select:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .ratio-select-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    margin: 0;
+    list-style: none;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel-bg);
+    padding: 4px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.24);
+  }
+
+  .ratio-select-option {
+    display: block;
+    width: 100%;
+    border-radius: 4px;
+    padding: 8px 10px;
+    text-align: left;
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--panel-text-muted);
+    transition: background-color 150ms var(--ease), color 150ms var(--ease);
+  }
+
+  .ratio-select-option-active {
+    background: var(--panel-row-active);
+    color: var(--panel-text-strong);
+  }
+
   .panel-slot {
     z-index: 1;
     transition: transform 200ms var(--ease);
@@ -358,6 +408,16 @@
   .btn-quiet:hover:not(:disabled) {
     background: var(--panel-row-hover);
     border-color: var(--border-hover);
+  }
+
+  .ratio-select:hover:not(:disabled) {
+    background: var(--panel-row-hover);
+    border-color: var(--border-hover);
+  }
+
+  .ratio-select-option:hover {
+    background: var(--panel-row-hover);
+    color: var(--panel-text-strong);
   }
 }
 

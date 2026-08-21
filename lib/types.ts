@@ -1,3 +1,6 @@
+export type { AspectRatioId } from "./aspect-ratio";
+export { DEFAULT_ASPECT_RATIO } from "./aspect-ratio";
+
 export type PanelCount = 2 | 3 | 4;
 export type GapPx = 4;
 export type PreviewGround = "checker" | "light" | "dark";

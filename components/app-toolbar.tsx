@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { flushSync } from "react-dom";
 import { exportTychPng } from "@/lib/export";
 import { IMAGE_ACCEPT } from "@/lib/images";
+import { AspectRatioSelect } from "./aspect-ratio-select";
 import { LisseButton } from "./lisse-button";
 import { useTych } from "./tych-store";
 
@@ -11,12 +12,14 @@ export function AppToolbar() {
   const {
     count,
     gap,
+    aspectRatio,
     slots,
     crops,
     exporting,
     error,
     addFiles,
     replaceAll,
+    setAspectRatio,
     setExporting,
     setError,
   } = useTych();
@@ -32,7 +35,7 @@ export function AppToolbar() {
       setExporting(true);
     });
     try {
-      await exportTychPng({ count, gap, slots, crops });
+      await exportTychPng({ count, gap, aspectRatio, slots, crops });
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
       setError(err instanceof Error ? err.message : "Could not save the PNG.");
@@ -43,15 +46,22 @@ export function AppToolbar() {
 
   return (
     <div className="mt-6">
-      <div className="flex items-center justify-between gap-4">
-        <button
-          type="button"
-          disabled={exporting}
-          onClick={() => inputRef.current?.click()}
-          className="btn-quiet geist-focus-visible px-3 text-[14px] font-medium"
-        >
-          {atMax ? "Replace images" : "Add images"}
-        </button>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <button
+            type="button"
+            disabled={exporting}
+            onClick={() => inputRef.current?.click()}
+            className="btn-quiet geist-focus-visible shrink-0 px-3 text-[14px] font-medium"
+          >
+            {atMax ? "Replace images" : "Add images"}
+          </button>
+          <AspectRatioSelect
+            value={aspectRatio}
+            onChange={setAspectRatio}
+            disabled={exporting}
+          />
+        </div>
         <input
           ref={inputRef}
           type="file"
@@ -70,7 +80,7 @@ export function AppToolbar() {
           radius={6}
           disabled={!ready || exporting}
           onClick={() => void onSave()}
-          className="btn-solid px-3 text-[14px] font-medium"
+          className="btn-solid shrink-0 px-3 text-[14px] font-medium"
         >
           {exporting ? "Saving…" : "Save"}
         </LisseButton>
