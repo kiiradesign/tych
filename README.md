@@ -35,7 +35,6 @@ Tych brings the visual result back as a single postable image.
 - Full-color PNG export under **5 MB**, resolution taken from your source photos
 - Fully client-side — images never leave your browser
 - Dark, quiet, photographic UI (Geist + Dialkit)
-- Mobile-friendly toolbar — ratio on its own row; Add/Replace and Save with icons
 
 ---
 

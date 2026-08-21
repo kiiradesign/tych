@@ -8,14 +8,11 @@ export function AspectRatioSelect({
   value,
   onChange,
   disabled,
-  spread = false,
   className,
 }: {
   value: AspectRatioId;
   onChange: (value: AspectRatioId) => void;
   disabled?: boolean;
-  /** Full-width row: label left, value + chevron right. */
-  spread?: boolean;
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -38,30 +35,8 @@ export function AspectRatioSelect({
     };
   }, [open]);
 
-  const chevron = (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      className={cn(
-        "shrink-0 text-[var(--panel-text-subtle)] transition-transform duration-150",
-        open && "rotate-180",
-      )}
-      aria-hidden
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-
   return (
-    <div
-      ref={rootRef}
-      className={cn("relative", spread ? "w-full" : "shrink-0", className)}
-    >
+    <div ref={rootRef} className={cn("relative shrink-0", className)}>
       <button
         type="button"
         disabled={disabled}
@@ -69,34 +44,32 @@ export function AspectRatioSelect({
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "ratio-select geist-focus-visible flex items-center px-3 text-[14px]",
-          spread ? "w-full justify-between gap-3" : "gap-1.5",
+          "ratio-select geist-focus-visible flex items-center gap-1.5 px-2.5 text-[14px] sm:px-3",
           disabled && "opacity-50",
         )}
       >
-        {spread ? (
-          <>
-            <span className="whitespace-nowrap text-[var(--panel-text-muted)]">
-              Ratio
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="font-mono tabular-nums text-[var(--panel-text-strong)]">
-                {label}
-              </span>
-              {chevron}
-            </span>
-          </>
-        ) : (
-          <>
-            <span className="whitespace-nowrap text-[var(--panel-text-muted)]">
-              Ratio
-            </span>
-            <span className="font-mono tabular-nums text-[var(--panel-text-strong)]">
-              {label}
-            </span>
-            {chevron}
-          </>
-        )}
+        <span className="whitespace-nowrap text-[var(--panel-text-muted)]">
+          Ratio
+        </span>
+        <span className="font-mono tabular-nums text-[var(--panel-text-strong)]">
+          {label}
+        </span>
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          className={cn(
+            "shrink-0 text-[var(--panel-text-subtle)] transition-transform duration-150",
+            open && "rotate-180",
+          )}
+          aria-hidden
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
       </button>
       {open ? (
         <ul
