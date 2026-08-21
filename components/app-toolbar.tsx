@@ -1,5 +1,6 @@
 "use client";
 
+import { DownloadSimple, Image as ImageIcon } from "@phosphor-icons/react";
 import { useRef } from "react";
 import { flushSync } from "react-dom";
 import { exportTychPng } from "@/lib/export";
@@ -44,46 +45,68 @@ export function AppToolbar() {
     }
   }
 
+  const fileActionLabel = atMax ? "Replace" : "Add";
+
   return (
     <div className="mt-6">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <button
-            type="button"
-            disabled={exporting}
-            onClick={() => inputRef.current?.click()}
-            className="btn-quiet geist-focus-visible shrink-0 px-3 text-[14px] font-medium"
-          >
-            {atMax ? "Replace images" : "Add images"}
-          </button>
-          <AspectRatioSelect
-            value={aspectRatio}
-            onChange={setAspectRatio}
-            disabled={exporting}
-          />
-        </div>
-        <input
-          ref={inputRef}
-          type="file"
-          accept={IMAGE_ACCEPT}
-          multiple
-          className="hidden"
-          onChange={(e) => {
-            const files = [...(e.target.files ?? [])];
-            e.target.value = "";
-            if (!files.length) return;
-            if (atMax) void replaceAll(files);
-            else void addFiles(files);
-          }}
+      <div className="flex flex-col gap-2 sm:gap-3">
+        <AspectRatioSelect
+          value={aspectRatio}
+          onChange={setAspectRatio}
+          disabled={exporting}
+          spread
+          className="sm:hidden"
         />
-        <LisseButton
-          radius={6}
-          disabled={!ready || exporting}
-          onClick={() => void onSave()}
-          className="btn-solid shrink-0 px-3 text-[14px] font-medium"
-        >
-          {exporting ? "Saving…" : "Save"}
-        </LisseButton>
+
+        <div className="flex items-stretch gap-2 sm:items-center sm:justify-between sm:gap-3">
+          <div className="flex min-w-0 flex-1 items-stretch gap-2 sm:items-center sm:gap-3">
+            <button
+              type="button"
+              disabled={exporting}
+              onClick={() => inputRef.current?.click()}
+              className="btn-quiet geist-focus-visible inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 px-3 text-[14px] font-medium sm:flex-none sm:shrink-0"
+            >
+              <ImageIcon size={16} weight="regular" aria-hidden />
+              {fileActionLabel}
+            </button>
+            <AspectRatioSelect
+              value={aspectRatio}
+              onChange={setAspectRatio}
+              disabled={exporting}
+              className="hidden sm:block"
+            />
+          </div>
+          <input
+            ref={inputRef}
+            type="file"
+            accept={IMAGE_ACCEPT}
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              const files = [...(e.target.files ?? [])];
+              e.target.value = "";
+              if (!files.length) return;
+              if (atMax) void replaceAll(files);
+              else void addFiles(files);
+            }}
+          />
+          <LisseButton
+            radius={6}
+            disabled={!ready || exporting}
+            onClick={() => void onSave()}
+            wrapClassName="min-w-0 flex-1 sm:flex-none"
+            className="btn-solid inline-flex w-full items-center justify-center gap-1.5 px-3 text-[14px] font-medium sm:w-auto"
+          >
+            {exporting ? (
+              "Saving…"
+            ) : (
+              <>
+                <DownloadSimple size={16} weight="regular" aria-hidden />
+                Save
+              </>
+            )}
+          </LisseButton>
+        </div>
       </div>
       {error ? (
         <p className="mt-3 text-[13px] text-[var(--panel-text-muted)]">{error}</p>
