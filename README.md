@@ -23,7 +23,7 @@ Tych brings the visual result back as a single postable image.
 ## Features
 
 - Choose **2, 3, or 4** images
-- **Ratio** picker — 1:1, 4:5, 3:4, 2:3, or 9:16 (rendered landscape; width is always the long edge). Default: **16:9** (900 × 506).
+- **Ratio** picker — 9:16, 2:3, 3:4, 4:5, or 1:1 (rendered landscape; width is always the long edge). Default: **16:9** (900 × 506).
 - Per-panel cropping in a **centered crop modal** — pan, pinch, or scroll to zoom; what you see is what exports
 - **Drag to reorder** panels on the grid (swap by dragging one photo onto another)
 - Classic layouts:
