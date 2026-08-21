@@ -15,7 +15,7 @@ export const ASPECT_RATIO_OPTIONS: {
   { id: "9:16", label: "9:16", w: 9, h: 16 },
 ];
 
-export const DEFAULT_ASPECT_RATIO: AspectRatioId = "1:1";
+export const DEFAULT_ASPECT_RATIO: AspectRatioId = "9:16";
 
 export function aspectParts(id: AspectRatioId): { w: number; h: number } {
   const opt = ASPECT_RATIO_OPTIONS.find((o) => o.id === id);

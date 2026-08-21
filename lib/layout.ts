@@ -1,6 +1,6 @@
 import type { AspectRatioId, GapPx, PanelCount, Rect, TychLayout } from "./types";
 import { PREVIEW_WIDTH } from "./types";
-import { previewHeightForAspect } from "./aspect-ratio";
+import { DEFAULT_ASPECT_RATIO, previewHeightForAspect } from "./aspect-ratio";
 
 /**
  * Integer split of `total` into two parts separated by `gap`.
@@ -28,7 +28,7 @@ export function getTychLayout(
   height?: number,
   aspectRatio?: AspectRatioId,
 ): TychLayout {
-  const h = height ?? previewHeightForAspect(aspectRatio ?? "1:1", width);
+  const h = height ?? previewHeightForAspect(aspectRatio ?? DEFAULT_ASPECT_RATIO, width);
   const [left, right] = splitWithGap(width, gap);
   const rightX = left + gap;
 
