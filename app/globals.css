@@ -336,7 +336,7 @@
     display: block;
     width: 100%;
     border-radius: 4px;
-    padding: 8px 10px;
+    padding: 6px 8px;
     text-align: left;
     font-family: var(--font-geist-mono), ui-monospace, monospace;
     font-size: 13px;

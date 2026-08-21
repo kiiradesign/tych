@@ -34,7 +34,7 @@ export function AspectRatioSelect({
   }, [open]);
 
   return (
-    <div ref={rootRef} className="relative min-w-[12.5rem]">
+    <div ref={rootRef} className="relative shrink-0">
       <button
         type="button"
         disabled={disabled}
@@ -42,12 +42,14 @@ export function AspectRatioSelect({
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "ratio-select geist-focus-visible flex w-full items-center gap-2 px-3 text-[14px]",
+          "ratio-select geist-focus-visible flex items-center gap-1.5 px-2.5 text-[13px]",
           disabled && "opacity-50",
         )}
       >
-        <span className="text-[var(--panel-text-muted)]">Aspect ratio</span>
-        <span className="ml-auto font-mono text-[13px] tabular-nums text-[var(--panel-text-strong)]">
+        <span className="whitespace-nowrap text-[var(--panel-text-muted)]">
+          Aspect ratio
+        </span>
+        <span className="font-mono text-[13px] tabular-nums text-[var(--panel-text-strong)]">
           {label}
         </span>
         <svg
